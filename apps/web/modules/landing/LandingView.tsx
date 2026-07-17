@@ -4,8 +4,8 @@
 // Static marketing content + a branded login modal wired to the real NextAuth flow.
 import { ErrorCode } from "@calcom/features/auth/lib/ErrorCode";
 import { useRouter } from "next/navigation";
-import { signIn } from "next-auth/react";
-import { useState } from "react";
+import { getProviders, signIn } from "next-auth/react";
+import { useEffect, useState } from "react";
 
 const ArrowRight = () => (
   <svg
@@ -179,6 +179,15 @@ export default function LandingView() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  // Only offer a social provider if it's actually registered server-side (env-gated).
+  // Prevents dead "Войти с Yandex" buttons when YANDEX_* isn't configured on a deployment.
+  const [providers, setProviders] = useState<Record<string, unknown> | null>(null);
+  useEffect(() => {
+    getProviders()
+      .then((p) => setProviders(p ?? {}))
+      .catch(() => setProviders({}));
+  }, []);
+  const hasProvider = (id: string) => !providers || id in providers;
 
   const openLogin = () => {
     setAuthView("login");
@@ -1567,6 +1576,7 @@ export default function LandingView() {
                   }}>
                   Войдите, чтобы управлять расписанием
                 </p>
+                {hasProvider("google") && (
                 <button
                   type="button"
                   onClick={loginWithGoogle}
@@ -1602,6 +1612,8 @@ export default function LandingView() {
                   </svg>
                   Войти с помощью Google
                 </button>
+                )}
+                {hasProvider("yandex") && (
                 <button
                   type="button"
                   onClick={loginWithYandex}
@@ -1630,6 +1642,7 @@ export default function LandingView() {
                   </svg>
                   Войти с Yandex ID
                 </button>
+                )}
                 <div style={{ display: "flex", alignItems: "center", gap: 14, margin: "20px 0" }}>
                   <span style={{ flex: 1, height: 1, background: "rgba(20,30,45,.1)" }} />
                   <span style={{ font: "500 12.5px 'Golos Text'", color: "#A9B4BF" }}>или по email</span>
@@ -1793,6 +1806,7 @@ export default function LandingView() {
                   }}>
                   Регистрация за минуту — дальше настроим профиль
                 </p>
+                {hasProvider("google") && (
                 <button
                   type="button"
                   onClick={registerWithGoogle}
@@ -1828,6 +1842,8 @@ export default function LandingView() {
                   </svg>
                   Продолжить с Google
                 </button>
+                )}
+                {hasProvider("yandex") && (
                 <button
                   type="button"
                   onClick={registerWithYandex}
@@ -1856,6 +1872,7 @@ export default function LandingView() {
                   </svg>
                   Продолжить с Yandex ID
                 </button>
+                )}
                 <div style={{ display: "flex", alignItems: "center", gap: 14, margin: "20px 0" }}>
                   <span style={{ flex: 1, height: 1, background: "rgba(20,30,45,.1)" }} />
                   <span style={{ font: "500 12.5px 'Golos Text'", color: "#8E97A4" }}>или по email</span>
