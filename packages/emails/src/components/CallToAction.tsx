@@ -31,12 +31,14 @@ export const CallToAction = (props: {
     <p
       style={{
         display: "inline-block",
-        background: secondary ? "#FFFFFF" : "#2f6fd0",
+        // Slotix: primary CTA is a blue gradient (solid #5094f0 fallback for Outlook).
+        backgroundColor: secondary ? "#FFFFFF" : "#5094f0",
+        background: secondary ? "#FFFFFF" : "linear-gradient(135deg,#66A6FF,#5094F0)",
         border: secondary ? "1px solid #d1d5db" : "",
         color: "#ffffff",
         fontFamily: "Roboto, Helvetica, sans-serif",
         fontSize: "0.875rem",
-        fontWeight: 500,
+        fontWeight: 600,
         lineHeight: "1rem",
         margin: 0,
         textDecoration: "none",
@@ -45,7 +47,7 @@ export const CallToAction = (props: {
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
         msoPaddingAlt: "0px",
-        borderRadius: "6px",
+        borderRadius: "10px",
         boxSizing: "border-box",
         height: "2.25rem",
       }}>

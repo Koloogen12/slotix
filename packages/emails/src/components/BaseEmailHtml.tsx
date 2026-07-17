@@ -28,8 +28,8 @@ export const BaseEmailHtml = (props: {
   return (
     <Html>
       <EmailHead title={props.subject} />
-      <body style={{ wordSpacing: "normal", backgroundColor: "#F3F4F6" }}>
-        <div style={{ backgroundColor: "#F3F4F6" }}>
+      <body style={{ wordSpacing: "normal", backgroundColor: "#EAF2FB" }}>
+        <div style={{ backgroundColor: "#EAF2FB" }}>
           <RawHtml
             html={`<!--[if mso | IE]><table align="center" border="0" cellpadding="0" cellspacing="0" class="" style="width:600px;" width="600" ><tr><td style="line-height:0px;font-size:0px;mso-line-height-rule:exactly;"><![endif]-->`}
           />
@@ -53,11 +53,23 @@ export const BaseEmailHtml = (props: {
             style={{
               margin: "0px auto",
               maxWidth: 600,
-              borderRadius: "8px",
-              border: "1px solid #E5E7EB",
-              padding: "2px",
+              borderRadius: "16px",
+              border: "1px solid #E3ECF6",
+              overflow: "hidden",
               backgroundColor: "#FFFFFF",
+              boxShadow: "0 12px 30px rgba(20,40,70,0.10)",
             }}>
+            {/* Slotix: brand gradient bar across the top of every email (solid fallback for Outlook) */}
+            <div
+              style={{
+                height: "4px",
+                lineHeight: "4px",
+                fontSize: "1px",
+                backgroundColor: "#5094f0",
+                background: "linear-gradient(90deg,#66A6FF,#5094F0)",
+              }}>
+              &nbsp;
+            </div>
             {props.headerType && (
               <EmailSchedulingBodyHeader headerType={props.headerType} headStyles={{ border: 0 }} />
             )}
