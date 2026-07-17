@@ -1,6 +1,12 @@
+"use client";
+
 // Slotix marketing landing — reproduces design_handoff_slotix/"Slotix - Лендинг" prototype.
-// Static content only; the email field and CTAs route to signup/login.
+// Static marketing content + a branded login modal wired to the real NextAuth flow.
+import { ErrorCode } from "@calcom/features/auth/lib/ErrorCode";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { signIn } from "next-auth/react";
+import { useState } from "react";
 
 const ArrowRight = () => (
   <svg
@@ -88,6 +94,73 @@ const integrations = [
   },
 ];
 
+// "Почему Slotix" cards (blocks 2–5), ordered by uniqueness — do not reorder.
+const whyCards = [
+  {
+    iconBg: "rgba(63,203,110,.15)",
+    badgeBg: "rgba(63,203,110,.13)",
+    color: "#2FA85A",
+    icon: (
+      <>
+        <path d="M17 2l4 4-4 4" />
+        <path d="M3 11V9a4 4 0 0 1 4-4h14" />
+        <path d="M7 22l-4-4 4-4" />
+        <path d="M21 13v2a4 4 0 0 1-4 4H3" />
+      </>
+    ),
+    badge: "Ноль потерянных клиентов",
+    title: "Следующая встреча назначается сама",
+    text: "Если в конспекте есть «созвониться через две недели» — там же появляется кнопка записи. Клиент бронирует в один тап, вы не пишете «ну что, когда удобно?».",
+    footer: "Каждая встреча приводит следующую.",
+  },
+  {
+    iconBg: "rgba(80,148,240,.14)",
+    badgeBg: "rgba(80,148,240,.12)",
+    color: "#2F6FD0",
+    icon: (
+      <>
+        <path d="M22 2L11 13" />
+        <path d="M22 2l-7 20-4-9-9-4z" />
+      </>
+    ),
+    badge: "Там, где ваши клиенты",
+    title: "Напоминания в Telegram, а не в спаме",
+    text: "Подтверждения, напоминания и конспекты приходят туда, где человек их точно увидит. С кнопками «Перенести» и «Записаться снова» прямо в сообщении.",
+    footer: "Меньше неявок — клиенту не нужно открывать почту.",
+  },
+  {
+    iconBg: "rgba(123,92,224,.14)",
+    badgeBg: "rgba(123,92,224,.12)",
+    color: "#7B5CE0",
+    icon: (
+      <>
+        <path d="M12 2l9 5-9 5-9-5z" />
+        <path d="M3 12l9 5 9-5" />
+        <path d="M3 17l9 5 9-5" />
+      </>
+    ),
+    badge: "Для тех, кто работает курсом",
+    title: "Продавайте встречи сразу пакетом",
+    text: "Клиент оплачивает пакет и сам записывается на удобные слоты — остаток списывается автоматически. Для репетиторов, коучей и всех, кто ведёт клиента вдолгую.",
+    footer: "Предоплаченный клиент возвращается, а не «подумает».",
+  },
+  {
+    iconBg: "rgba(63,203,110,.15)",
+    badgeBg: "rgba(63,203,110,.13)",
+    color: "#2FA85A",
+    icon: (
+      <>
+        <path d="M10 13a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1.5 1.5" />
+        <path d="M14 11a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1.5-1.5" />
+      </>
+    ),
+    badge: "Сделано для рунета",
+    title: "Телемост, ЮKassa и письма, которые доходят",
+    text: "Автоссылка на Яндекс Телемост, Google Meet или Zoom при записи. Оплата российскими картами через ЮKassa. Уведомления, которые не улетают в спам на mail.ru и Яндексе.",
+    footer: "То, что зарубежные Calendly не сделают.",
+  },
+];
+
 const availableDays = [10, 11, 17, 18, 22, 23, 24, 29, 30, 31];
 const weekdays = ["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"];
 
@@ -98,6 +171,68 @@ const chatBubbleOut =
   "align-self:flex-end;max-width:82%;padding:11px 15px;border-radius:18px 18px 5px 18px;background:linear-gradient(135deg,#66A6FF,#5094F0);color:#fff;font:400 14.5px/1.35 'Golos Text';box-shadow:0 6px 16px rgba(80,148,240,.28)";
 
 export default function LandingView() {
+  const router = useRouter();
+  const [loginOpen, setLoginOpen] = useState(false);
+  const [authView, setAuthView] = useState<"login" | "reset" | "sent">("login");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+
+  const openLogin = () => {
+    setAuthView("login");
+    setError(null);
+    setLoginOpen(true);
+  };
+  const closeLogin = () => {
+    setLoginOpen(false);
+    setAuthView("login");
+    setError(null);
+  };
+  const loginWithGoogle = () => signIn("google", { callbackUrl: "/event-types" });
+  const loginWithCredentials = async () => {
+    setError(null);
+    setLoading(true);
+    const res = await signIn("credentials", {
+      email,
+      password,
+      redirect: false,
+      callbackUrl: "/event-types",
+    });
+    setLoading(false);
+    if (!res) return setError("Не удалось войти. Попробуйте ещё раз.");
+    if (!res.error) {
+      router.push(res.url || "/event-types");
+      return;
+    }
+    // 2FA needs the full login page flow — hand off there with the email prefilled.
+    if (res.error === ErrorCode.SecondFactorRequired) {
+      window.location.href = `/auth/login?email=${encodeURIComponent(email)}`;
+      return;
+    }
+    if (res.error === ErrorCode.IncorrectEmailPassword) return setError("Неверный email или пароль.");
+    if (res.error === ErrorCode.ThirdPartyIdentityProviderEnabled)
+      return setError("Этот аккаунт создан через Google. Войдите через Google.");
+    setError("Не удалось войти. Попробуйте ещё раз.");
+  };
+  const sendReset = async () => {
+    setError(null);
+    setLoading(true);
+    try {
+      const res = await fetch("/api/auth/forgot-password", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      });
+      setLoading(false);
+      if (res.ok) setAuthView("sent");
+      else setError("Не удалось отправить письмо. Проверьте адрес.");
+    } catch {
+      setLoading(false);
+      setError("Не удалось отправить письмо. Попробуйте позже.");
+    }
+  };
+
   return (
     <div
       style={{
@@ -154,9 +289,19 @@ export default function LandingView() {
             <a href="#integrations" className="sx-a sx-navlinks-wide">
               Интеграции
             </a>
-            <Link href="/auth/login" style={{ font: "600 15px 'Golos Text'", color: "#1A1C1E" }}>
+            <button
+              type="button"
+              onClick={openLogin}
+              style={{
+                font: "600 15px 'Golos Text'",
+                color: "#1A1C1E",
+                background: "none",
+                border: "none",
+                padding: 0,
+                cursor: "pointer",
+              }}>
               Вход
-            </Link>
+            </button>
             <Link
               href="/signup"
               className="sx-cta"
@@ -706,6 +851,373 @@ export default function LandingView() {
         </div>
       </div>
 
+      {/* WHY SLOTIX */}
+      <div
+        id="why"
+        style={{ maxWidth: 1200, margin: "0 auto", padding: "clamp(40px,6vw,80px) clamp(20px,5vw,40px)" }}>
+        <div style={{ textAlign: "center", maxWidth: 680, margin: "0 auto clamp(36px,4vw,52px)" }}>
+          <div
+            style={{
+              font: "700 13px 'Golos Text'",
+              letterSpacing: ".08em",
+              textTransform: "uppercase",
+              color: "#5094F0",
+              marginBottom: 12,
+            }}>
+            Почему Slotix, а не просто календарь
+          </div>
+          <h2
+            style={{
+              font: "800 clamp(28px,3.4vw,42px)/1.1 'Golos Text'",
+              letterSpacing: "-.02em",
+              color: "#1A1C1E",
+              margin: "0 0 16px",
+            }}>
+            Встреча не заканчивается, когда вы кладёте трубку
+          </h2>
+          <p
+            style={{
+              font: "400 clamp(16px,1.4vw,19px)/1.55 'Golos Text'",
+              color: "#5C6672",
+              margin: "0 auto",
+              maxWidth: 560,
+            }}>
+            Slotix ведёт клиента от записи до результата — и возвращает его на следующую встречу.
+          </p>
+        </div>
+
+        {/* Block 1 — AI summary hero card */}
+        <div
+          style={{
+            position: "relative",
+            background: "rgba(255,255,255,.58)",
+            backdropFilter: "blur(26px) saturate(1.35)",
+            WebkitBackdropFilter: "blur(26px) saturate(1.35)",
+            border: "1px solid rgba(255,255,255,.65)",
+            borderRadius: 30,
+            boxShadow: "0 22px 56px rgba(20,40,70,.1)",
+            padding: "clamp(30px,4vw,48px)",
+            display: "flex",
+            flexWrap: "wrap",
+            gap: "clamp(32px,4vw,56px)",
+            alignItems: "center",
+            marginBottom: 20,
+            overflow: "hidden",
+          }}>
+          <div style={{ flex: "1 1 380px", minWidth: 300 }}>
+            <div
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 9,
+                padding: "8px 15px",
+                borderRadius: 100,
+                background: "rgba(123,92,224,.13)",
+                font: "700 13px 'Golos Text'",
+                color: "#7B5CE0",
+                marginBottom: 20,
+              }}>
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round">
+                <path d="M12 3l1.9 4.6L18.5 9.5 13.9 11.4 12 16l-1.9-4.6L5.5 9.5l4.6-1.9z" />
+                <path d="M19 15l.7 1.8 1.8.7-1.8.7L19 20l-.7-1.8-1.8-.7 1.8-.7z" />
+              </svg>
+              AI-конспект
+            </div>
+            <h3
+              style={{
+                font: "800 clamp(24px,2.8vw,34px)/1.12 'Golos Text'",
+                letterSpacing: "-.015em",
+                color: "#1A1C1E",
+                margin: "0 0 16px",
+              }}>
+              Не ведите заметки — просто проведите встречу
+            </h3>
+            <p
+              style={{
+                font: "400 clamp(15px,1.3vw,17px)/1.6 'Golos Text'",
+                color: "#5C6672",
+                margin: "0 0 20px",
+                maxWidth: 480,
+              }}>
+              Бот подключается к звонку, слушает и присылает готовый конспект с задачами и договорённостями.
+              Вам и клиенту — сразу после встречи, на почту и в Telegram.
+            </p>
+            <div
+              style={{
+                display: "flex",
+                gap: 9,
+                alignItems: "flex-start",
+                paddingTop: 18,
+                borderTop: "1px solid rgba(20,30,45,.08)",
+                marginBottom: 26,
+              }}>
+              <svg
+                width="17"
+                height="17"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="#7B5CE0"
+                strokeWidth="2.4"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                style={{ flex: "none", marginTop: 1 }}>
+                <path d="M5 12h14M13 6l6 6-6 6" />
+              </svg>
+              <span style={{ font: "600 14px/1.4 'Golos Text'", color: "#4A5560" }}>
+                Вы вспоминаете, о чём договорились, не пересматривая часовую запись.
+              </span>
+            </div>
+            <a
+              href="#pricing"
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 9,
+                padding: "14px 24px",
+                borderRadius: 14,
+                background: "linear-gradient(135deg,#8E6FE8,#7B5CE0)",
+                color: "#fff",
+                font: "700 15px 'Golos Text'",
+                boxShadow: "0 12px 28px rgba(123,92,224,.34)",
+              }}>
+              Забронировать ранний доступ
+              <svg
+                width="17"
+                height="17"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.4"
+                strokeLinecap="round"
+                strokeLinejoin="round">
+                <path d="M5 12h14M13 6l6 6-6 6" />
+              </svg>
+            </a>
+          </div>
+          <div style={{ flex: "1 1 360px", minWidth: 300, display: "flex", justifyContent: "center" }}>
+            <div
+              style={{
+                width: "100%",
+                maxWidth: 400,
+                background: "rgba(255,255,255,.72)",
+                backdropFilter: "blur(24px) saturate(1.4)",
+                WebkitBackdropFilter: "blur(24px) saturate(1.4)",
+                border: "1px solid rgba(255,255,255,.75)",
+                borderRadius: 24,
+                boxShadow: "0 20px 48px rgba(20,40,70,.13)",
+                padding: "24px 22px",
+              }}>
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 11,
+                  paddingBottom: 16,
+                  marginBottom: 16,
+                  borderBottom: "1px solid rgba(20,30,45,.07)",
+                }}>
+                <div
+                  style={{
+                    width: 40,
+                    height: 40,
+                    borderRadius: 12,
+                    background: "linear-gradient(135deg,#8E6FE8,#7B5CE0)",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    flex: "none",
+                    boxShadow: "0 8px 18px rgba(123,92,224,.32)",
+                  }}>
+                  <svg
+                    width="22"
+                    height="22"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="#fff"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round">
+                    <path d="M12 3l1.9 4.6L18.5 9.5 13.9 11.4 12 16l-1.9-4.6L5.5 9.5l4.6-1.9z" />
+                  </svg>
+                </div>
+                <div style={{ flex: 1 }}>
+                  <div style={{ font: "700 15px 'Golos Text'", color: "#1A1C1E" }}>Конспект встречи</div>
+                  <div style={{ font: "400 12px 'Golos Text'", color: "#8E97A4" }}>
+                    Консультация · сегодня, 14:00
+                  </div>
+                </div>
+              </div>
+              <div
+                style={{
+                  font: "700 11px 'Golos Text'",
+                  letterSpacing: ".06em",
+                  textTransform: "uppercase",
+                  color: "#8E97A4",
+                  marginBottom: 9,
+                }}>
+                Договорённости
+              </div>
+              <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 18 }}>
+                {["Клиент присылает бриф до пятницы", "Готовлю смету на 3 варианта"].map((item) => (
+                  <div key={item} style={{ display: "flex", gap: 9, alignItems: "flex-start" }}>
+                    <span
+                      style={{
+                        width: 19,
+                        height: 19,
+                        borderRadius: 6,
+                        background: "rgba(63,203,110,.16)",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        flex: "none",
+                        marginTop: 1,
+                      }}>
+                      <svg
+                        width="12"
+                        height="12"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="#2FA85A"
+                        strokeWidth="3.2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round">
+                        <path d="M20 6L9 17l-5-5" />
+                      </svg>
+                    </span>
+                    <span style={{ font: "400 13.5px/1.4 'Golos Text'", color: "#3E4347" }}>{item}</span>
+                  </div>
+                ))}
+              </div>
+              <div
+                style={{
+                  borderRadius: 14,
+                  background: "rgba(80,148,240,.1)",
+                  border: "1px solid rgba(80,148,240,.2)",
+                  padding: "14px 15px",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 12,
+                }}>
+                <div style={{ flex: 1 }}>
+                  <div style={{ font: "700 13px 'Golos Text'", color: "#2F6FD0", marginBottom: 2 }}>
+                    Созвониться через 2 недели
+                  </div>
+                  <div style={{ font: "400 12px 'Golos Text'", color: "#5C6672" }}>
+                    Slotix предложит слот автоматически
+                  </div>
+                </div>
+                <span
+                  style={{
+                    flex: "none",
+                    padding: "9px 15px",
+                    borderRadius: 10,
+                    background: "linear-gradient(135deg,#66A6FF,#5094F0)",
+                    color: "#fff",
+                    font: "700 13px 'Golos Text'",
+                    boxShadow: "0 6px 16px rgba(80,148,240,.34)",
+                  }}>
+                  Записаться
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Blocks 2–5 */}
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(250px,1fr))", gap: 20 }}>
+          {whyCards.map((c) => (
+            <div
+              key={c.title}
+              style={{
+                position: "relative",
+                background: "rgba(255,255,255,.55)",
+                backdropFilter: "blur(24px) saturate(1.3)",
+                WebkitBackdropFilter: "blur(24px) saturate(1.3)",
+                border: "1px solid rgba(255,255,255,.6)",
+                borderRadius: 24,
+                boxShadow: "0 14px 38px rgba(20,40,70,.07)",
+                padding: "28px 26px",
+                display: "flex",
+                flexDirection: "column",
+              }}>
+              <div
+                style={{
+                  width: 48,
+                  height: 48,
+                  borderRadius: 14,
+                  background: c.iconBg,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  marginBottom: 18,
+                  color: c.color,
+                }}>
+                <svg
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round">
+                  {c.icon}
+                </svg>
+              </div>
+              <span
+                style={{
+                  alignSelf: "flex-start",
+                  padding: "6px 13px",
+                  borderRadius: 100,
+                  background: c.badgeBg,
+                  font: "700 12px 'Golos Text'",
+                  color: c.color,
+                  marginBottom: 14,
+                }}>
+                {c.badge}
+              </span>
+              <div style={{ font: "700 19px 'Golos Text'", color: "#1A1C1E", marginBottom: 10 }}>
+                {c.title}
+              </div>
+              <div style={{ font: "400 14.5px/1.55 'Golos Text'", color: "#5C6672", flex: 1 }}>{c.text}</div>
+              <div
+                style={{
+                  display: "flex",
+                  gap: 8,
+                  alignItems: "center",
+                  marginTop: 18,
+                  paddingTop: 15,
+                  borderTop: "1px solid rgba(20,30,45,.07)",
+                  font: "600 13px 'Golos Text'",
+                  color: c.color,
+                }}>
+                <svg
+                  width="15"
+                  height="15"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.6"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  style={{ flex: "none" }}>
+                  <path d="M5 12h14M13 6l6 6-6 6" />
+                </svg>
+                {c.footer}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
       {/* INTEGRATIONS */}
       <div
         id="integrations"
@@ -858,7 +1370,7 @@ export default function LandingView() {
               }}>
               Онлайн-сервис записи на встречи, консультации и занятия.
             </div>
-            <div style={{ font: "400 13px 'Golos Text'", color: "#A9B4BF" }}>© 2020–2026 Slotix</div>
+            <div style={{ font: "400 13px 'Golos Text'", color: "#A9B4BF" }}>© 2026 Slotix</div>
           </div>
           <div style={{ flex: "0 1 auto", minWidth: 150 }}>
             <div style={{ font: "700 14px 'Golos Text'", color: "#1A1C1E", marginBottom: 14 }}>Продукт</div>
@@ -869,9 +1381,19 @@ export default function LandingView() {
               <a href="#integrations" className="sx-a">
                 Интеграции
               </a>
-              <Link href="/auth/login" className="sx-a">
+              <button
+                type="button"
+                onClick={openLogin}
+                className="sx-a"
+                style={{
+                  background: "none",
+                  border: "none",
+                  padding: 0,
+                  cursor: "pointer",
+                  textAlign: "left",
+                }}>
                 Войти
-              </Link>
+              </button>
             </div>
           </div>
           <div style={{ flex: "0 1 auto", minWidth: 150 }}>
@@ -879,9 +1401,6 @@ export default function LandingView() {
             <div style={{ display: "flex", flexDirection: "column", gap: 11, font: "400 14px 'Golos Text'" }}>
               <a href="#" className="sx-a">
                 Справочный центр
-              </a>
-              <a href="#" className="sx-a">
-                Сообщество
               </a>
               <a href="#" className="sx-a">
                 Политика конфиденциальности
@@ -893,6 +1412,429 @@ export default function LandingView() {
           </div>
         </div>
       </div>
+
+      {/* LOGIN MODAL — branded entry wired to the real NextAuth flow */}
+      {loginOpen && (
+        <div
+          onClick={closeLogin}
+          style={{
+            position: "fixed",
+            inset: 0,
+            zIndex: 100,
+            background: "rgba(20,32,54,.42)",
+            backdropFilter: "blur(7px)",
+            WebkitBackdropFilter: "blur(7px)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            padding: 24,
+            boxSizing: "border-box",
+          }}>
+          <div
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              width: "100%",
+              maxWidth: 420,
+              background: "rgba(255,255,255,.9)",
+              backdropFilter: "blur(30px) saturate(1.4)",
+              WebkitBackdropFilter: "blur(30px) saturate(1.4)",
+              border: "1px solid rgba(255,255,255,.75)",
+              borderRadius: 26,
+              boxShadow: "0 30px 74px rgba(20,40,70,.3)",
+              padding: "36px 32px",
+              position: "relative",
+              boxSizing: "border-box",
+            }}>
+            <button
+              type="button"
+              onClick={closeLogin}
+              aria-label="Закрыть"
+              style={{
+                position: "absolute",
+                top: 18,
+                right: 18,
+                width: 34,
+                height: 34,
+                borderRadius: "50%",
+                background: "rgba(120,132,148,.12)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                cursor: "pointer",
+                color: "#5C6672",
+                border: "none",
+              }}>
+              <svg
+                width="17"
+                height="17"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.4"
+                strokeLinecap="round"
+                strokeLinejoin="round">
+                <path d="M18 6L6 18M6 6l12 12" />
+              </svg>
+            </button>
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 10,
+                justifyContent: "center",
+                marginBottom: 18,
+              }}>
+              <img src="/slotix/slotix-icon.png" alt="" style={{ width: 38, height: 38, borderRadius: 10 }} />
+            </div>
+
+            {authView === "login" && (
+              <div>
+                <h3
+                  style={{
+                    textAlign: "center",
+                    font: "800 24px 'Golos Text'",
+                    letterSpacing: "-.01em",
+                    color: "#1A1C1E",
+                    margin: "0 0 6px",
+                  }}>
+                  С возвращением
+                </h3>
+                <p
+                  style={{
+                    textAlign: "center",
+                    font: "400 14.5px 'Golos Text'",
+                    color: "#8E97A4",
+                    margin: "0 0 26px",
+                  }}>
+                  Войдите, чтобы управлять расписанием
+                </p>
+                <button
+                  type="button"
+                  onClick={loginWithGoogle}
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    gap: 11,
+                    width: "100%",
+                    boxSizing: "border-box",
+                    padding: 13,
+                    border: "1px solid #D6DEE9",
+                    borderRadius: 13,
+                    background: "#fff",
+                    color: "#1A1C1E",
+                    font: "600 14.5px 'Golos Text'",
+                    cursor: "pointer",
+                  }}>
+                  <svg width="18" height="18" viewBox="0 0 24 24">
+                    <path
+                      fill="#4285F4"
+                      d="M22.5 12.2c0-.7-.1-1.4-.2-2H12v3.8h5.9a5 5 0 0 1-2.2 3.3v2.7h3.6c2.1-2 3.2-4.8 3.2-7.8z"
+                    />
+                    <path
+                      fill="#34A853"
+                      d="M12 23c2.9 0 5.4-1 7.2-2.6l-3.6-2.7c-1 .7-2.3 1-3.6 1-2.8 0-5.1-1.9-6-4.4H2.3v2.8A11 11 0 0 0 12 23z"
+                    />
+                    <path fill="#FBBC05" d="M6 14.3a6.6 6.6 0 0 1 0-4.2V7.3H2.3a11 11 0 0 0 0 9.8L6 14.3z" />
+                    <path
+                      fill="#EA4335"
+                      d="M12 5.4c1.6 0 3 .5 4.1 1.6l3.1-3.1A11 11 0 0 0 12 1a11 11 0 0 0-9.7 6l3.7 2.8c.9-2.5 3.2-4.4 6-4.4z"
+                    />
+                  </svg>
+                  Войти с помощью Google
+                </button>
+                <div style={{ display: "flex", alignItems: "center", gap: 14, margin: "20px 0" }}>
+                  <span style={{ flex: 1, height: 1, background: "rgba(20,30,45,.1)" }} />
+                  <span style={{ font: "500 12.5px 'Golos Text'", color: "#A9B4BF" }}>или по email</span>
+                  <span style={{ flex: 1, height: 1, background: "rgba(20,30,45,.1)" }} />
+                </div>
+                <form
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    loginWithCredentials();
+                  }}>
+                  <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+                    <div>
+                      <label
+                        style={{
+                          display: "block",
+                          font: "600 13px 'Golos Text'",
+                          color: "#1A1C1E",
+                          marginBottom: 7,
+                        }}>
+                        Email
+                      </label>
+                      <input
+                        className="sx-input"
+                        type="email"
+                        required
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        placeholder="you@mail.ru"
+                        style={{
+                          width: "100%",
+                          boxSizing: "border-box",
+                          padding: "13px 15px",
+                          borderRadius: 12,
+                          border: "1px solid #D6DEE9",
+                          background: "rgba(255,255,255,.85)",
+                          font: "400 15px 'Golos Text'",
+                          color: "#1A1C1E",
+                          outline: "none",
+                        }}
+                      />
+                    </div>
+                    <div>
+                      <div
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "space-between",
+                          marginBottom: 7,
+                        }}>
+                        <label style={{ font: "600 13px 'Golos Text'", color: "#1A1C1E" }}>Пароль</label>
+                        <button
+                          type="button"
+                          onClick={() => setAuthView("reset")}
+                          style={{
+                            font: "500 12.5px 'Golos Text'",
+                            color: "#5094F0",
+                            cursor: "pointer",
+                            background: "none",
+                            border: "none",
+                            padding: 0,
+                          }}>
+                          Забыли пароль?
+                        </button>
+                      </div>
+                      <input
+                        className="sx-input"
+                        type="password"
+                        required
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        placeholder="••••••••"
+                        style={{
+                          width: "100%",
+                          boxSizing: "border-box",
+                          padding: "13px 15px",
+                          borderRadius: 12,
+                          border: "1px solid #D6DEE9",
+                          background: "rgba(255,255,255,.85)",
+                          font: "400 15px 'Golos Text'",
+                          color: "#1A1C1E",
+                          outline: "none",
+                        }}
+                      />
+                    </div>
+                  </div>
+                  {error && (
+                    <div style={{ marginTop: 14, font: "500 13.5px 'Golos Text'", color: "#D14343" }}>
+                      {error}
+                    </div>
+                  )}
+                  <button
+                    type="submit"
+                    disabled={loading}
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      width: "100%",
+                      boxSizing: "border-box",
+                      marginTop: 22,
+                      padding: 15,
+                      border: "none",
+                      borderRadius: 13,
+                      background: "linear-gradient(135deg,#66A6FF,#5094F0)",
+                      color: "#fff",
+                      font: "700 15px 'Golos Text'",
+                      cursor: loading ? "default" : "pointer",
+                      opacity: loading ? 0.7 : 1,
+                      boxShadow: "0 12px 28px rgba(80,148,240,.36)",
+                    }}>
+                    {loading ? "Входим…" : "Войти"}
+                  </button>
+                </form>
+                <div
+                  style={{
+                    textAlign: "center",
+                    marginTop: 20,
+                    font: "400 14px 'Golos Text'",
+                    color: "#8E97A4",
+                  }}>
+                  Нет аккаунта?{" "}
+                  <Link href="/signup" style={{ fontWeight: 600, color: "#2F6FD0" }}>
+                    Зарегистрироваться
+                  </Link>
+                </div>
+              </div>
+            )}
+
+            {authView === "reset" && (
+              <div>
+                <h3
+                  style={{
+                    textAlign: "center",
+                    font: "800 24px 'Golos Text'",
+                    letterSpacing: "-.01em",
+                    color: "#1A1C1E",
+                    margin: "0 0 6px",
+                  }}>
+                  Восстановление пароля
+                </h3>
+                <p
+                  style={{
+                    textAlign: "center",
+                    font: "400 14.5px/1.5 'Golos Text'",
+                    color: "#8E97A4",
+                    margin: "0 0 26px",
+                  }}>
+                  Введите email — пришлём ссылку для смены пароля
+                </p>
+                <form
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    sendReset();
+                  }}>
+                  <label
+                    style={{
+                      display: "block",
+                      font: "600 13px 'Golos Text'",
+                      color: "#1A1C1E",
+                      marginBottom: 7,
+                    }}>
+                    Email
+                  </label>
+                  <input
+                    className="sx-input"
+                    type="email"
+                    required
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="you@mail.ru"
+                    style={{
+                      width: "100%",
+                      boxSizing: "border-box",
+                      padding: "13px 15px",
+                      borderRadius: 12,
+                      border: "1px solid #D6DEE9",
+                      background: "rgba(255,255,255,.85)",
+                      font: "400 15px 'Golos Text'",
+                      color: "#1A1C1E",
+                      outline: "none",
+                    }}
+                  />
+                  {error && (
+                    <div style={{ marginTop: 14, font: "500 13.5px 'Golos Text'", color: "#D14343" }}>
+                      {error}
+                    </div>
+                  )}
+                  <button
+                    type="submit"
+                    disabled={loading}
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      width: "100%",
+                      boxSizing: "border-box",
+                      marginTop: 22,
+                      padding: 15,
+                      border: "none",
+                      borderRadius: 13,
+                      background: "linear-gradient(135deg,#66A6FF,#5094F0)",
+                      color: "#fff",
+                      font: "700 15px 'Golos Text'",
+                      cursor: loading ? "default" : "pointer",
+                      opacity: loading ? 0.7 : 1,
+                      boxShadow: "0 12px 28px rgba(80,148,240,.36)",
+                    }}>
+                    {loading ? "Отправляем…" : "Отправить ссылку"}
+                  </button>
+                </form>
+                <div style={{ textAlign: "center", marginTop: 20 }}>
+                  <button
+                    type="button"
+                    onClick={() => setAuthView("login")}
+                    style={{
+                      font: "600 14px 'Golos Text'",
+                      color: "#8E97A4",
+                      cursor: "pointer",
+                      background: "none",
+                      border: "none",
+                    }}>
+                    ← Вернуться ко входу
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {authView === "sent" && (
+              <div style={{ textAlign: "center" }}>
+                <div
+                  style={{
+                    width: 60,
+                    height: 60,
+                    borderRadius: "50%",
+                    background: "rgba(63,203,110,.15)",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    margin: "0 auto 20px",
+                    color: "#2FA85A",
+                  }}>
+                  <svg
+                    width="30"
+                    height="30"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round">
+                    <rect x="3" y="5" width="18" height="14" rx="2.5" />
+                    <path d="M3 7l9 6 9-6" />
+                  </svg>
+                </div>
+                <h3
+                  style={{
+                    font: "800 24px 'Golos Text'",
+                    letterSpacing: "-.01em",
+                    color: "#1A1C1E",
+                    margin: "0 0 8px",
+                  }}>
+                  Проверьте почту
+                </h3>
+                <p style={{ font: "400 14.5px/1.55 'Golos Text'", color: "#8E97A4", margin: "0 0 26px" }}>
+                  Если аккаунт с таким email существует, мы отправили ссылку для смены пароля. Не пришло —
+                  проверьте папку «Спам».
+                </p>
+                <button
+                  type="button"
+                  onClick={() => setAuthView("login")}
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    width: "100%",
+                    boxSizing: "border-box",
+                    padding: 15,
+                    border: "none",
+                    borderRadius: 13,
+                    background: "linear-gradient(135deg,#66A6FF,#5094F0)",
+                    color: "#fff",
+                    font: "700 15px 'Golos Text'",
+                    cursor: "pointer",
+                    boxShadow: "0 12px 28px rgba(80,148,240,.36)",
+                  }}>
+                  Вернуться ко входу
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
