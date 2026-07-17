@@ -230,7 +230,7 @@ export default function InstalledApps({ category, connectedCalendars, installedC
 
   return (
     <>
-      <InstalledAppsLayout heading={t("installed_apps")} subtitle={t("manage_your_connected_apps")}>
+      <InstalledAppsLayout heading={t("integrations")} subtitle={t("manage_your_connected_apps")}>
         {categoryList.includes(category) && (
           <IntegrationsContainer handleDisconnect={handleDisconnect} variant={category} />
         )}
