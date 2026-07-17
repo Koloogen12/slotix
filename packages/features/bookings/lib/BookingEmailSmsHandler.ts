@@ -5,6 +5,7 @@ import { getTranslation } from "@calcom/i18n/server";
 import { getPiiFreeCalendarEvent } from "@calcom/lib/piiFreeData";
 import { safeStringify } from "@calcom/lib/safeStringify";
 import { getTimeFormatStringFromUserTimeFormat } from "@calcom/lib/timeFormat";
+import prisma from "@calcom/prisma";
 import type { Prisma, User } from "@calcom/prisma/client";
 import type { SchedulingType } from "@calcom/prisma/enums";
 import type { EventTypeMetadata } from "@calcom/prisma/zod-utils";
@@ -283,6 +284,34 @@ export class BookingEmailSmsHandler {
     } catch (err) {
       this.log.error("Failed to send scheduled event related emails", err);
     }
+
+    // Slotix: ping the organizer's linked Telegram about the new booking (best-effort).
+    try {
+      await this._notifyOrganizerTelegram(evt);
+    } catch (err) {
+      this.log.error("Failed to send Telegram booking notification", err);
+    }
+  }
+
+  private async _notifyOrganizerTelegram(evt: CalendarEvent) {
+    const organizerEmail = evt.organizer?.email;
+    if (!organizerEmail) return;
+    const organizer = await prisma.user.findFirst({
+      where: { email: organizerEmail },
+      select: { metadata: true },
+    });
+    const chatId = (organizer?.metadata as Record<string, unknown> | null)?.telegramChatId;
+    if (!chatId) return;
+
+    const { sendTelegramMessage } = await import("@calcom/lib/telegram");
+    const when = dayjs(evt.startTime)
+      .tz(evt.organizer?.timeZone || "UTC")
+      .format("DD.MM.YYYY HH:mm");
+    const attendee = evt.attendees?.[0]?.name || evt.attendees?.[0]?.email || "клиент";
+    await sendTelegramMessage(
+      String(chatId),
+      `📅 <b>Новое бронирование</b>\n${evt.title ?? "Встреча"}\n🕒 ${when}\n👤 ${attendee}`
+    );
   }
 
   /**
