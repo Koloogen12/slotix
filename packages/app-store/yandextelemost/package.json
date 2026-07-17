@@ -3,7 +3,7 @@
   "name": "@calcom/yandextelemost",
   "version": "0.0.0",
   "main": "./index.ts",
-  "description": "Яндекс Телемост — видеовстречи без ограничений по времени. Автоматически создаёт ссылку на конференцию при бронировании.",
+  "description": "Яндекс Телемост — видеовстречи для Slotix. Ссылка на конференцию создаётся автоматически при бронировании.",
   "dependencies": {
     "@calcom/lib": "workspace:*",
     "@calcom/prisma": "workspace:*"

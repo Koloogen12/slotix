@@ -1,4 +1,5 @@
 import { z } from "zod";
+
 import getAppKeysFromSlug from "../../_utils/getAppKeysFromSlug";
 
 const yandexTelemostAppKeysSchema = z.object({
@@ -7,6 +8,6 @@ const yandexTelemostAppKeysSchema = z.object({
 });
 
 export const getYandexTelemostAppKeys = async () => {
-  const appKeys = await getAppKeysFromSlug("yandextelemost");
+  const appKeys = await getAppKeysFromSlug("yandex-telemost");
   return yandexTelemostAppKeysSchema.parse(appKeys);
 };

@@ -1,9 +1,11 @@
+import type { NextApiRequest } from "next";
 import { stringify } from "node:querystring";
+
 import { WEBAPP_URL_FOR_OAUTH } from "@calcom/lib/constants";
 import { defaultHandler } from "@calcom/lib/server/defaultHandler";
 import { defaultResponder } from "@calcom/lib/server/defaultResponder";
 import prisma from "@calcom/prisma";
-import type { NextApiRequest } from "next";
+
 import { encodeOAuthState } from "../../_utils/oauth/encodeOAuthState";
 import { getYandexTelemostAppKeys } from "../lib";
 
@@ -20,8 +22,7 @@ async function handler(req: NextApiRequest) {
     response_type: "code",
     client_id,
     redirect_uri: `${WEBAPP_URL_FOR_OAUTH}/api/integrations/yandextelemost/callback`,
-    // @link https://yandex.ru/dev/telemost/doc/ru/access
-    scope: "telemost-api:conferences.create",
+    scope: "telemost-api:conferences.create telemost-api:conferences.read",
     state,
   };
   const query = stringify(params);

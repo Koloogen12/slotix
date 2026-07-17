@@ -1,24 +1,25 @@
 import type { AppMeta } from "@calcom/types/App";
 
 export const metadata = {
+  linkType: "dynamic",
   name: "Яндекс Телемост",
   description:
-    "Яндекс Телемост — видеовстречи без ограничений по времени, до 1000 участников. При бронировании автоматически создаётся ссылка на конференцию.",
-  type: "yandextelemost_video",
+    "Яндекс Телемост — видеовстречи без ограничений по времени. После бронирования ссылка на конференцию создаётся автоматически.",
+  type: "yandex_telemost_video",
   categories: ["conferencing"],
   variant: "conferencing",
   logo: "icon.svg",
   publisher: "Slotix",
   url: "https://telemost.yandex.ru/",
   category: "conferencing",
-  slug: "yandextelemost",
+  slug: "yandex-telemost",
   title: "Яндекс Телемост",
   email: "help@slotix.neurin.tech",
   appData: {
     location: {
       default: false,
       linkType: "dynamic",
-      type: "integrations:yandextelemost",
+      type: "integrations:yandex_telemost",
       label: "Яндекс Телемост",
     },
   },
