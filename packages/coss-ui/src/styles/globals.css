@@ -10,8 +10,7 @@
   --font-sans: var(--font-sans);
   --font-heading: var(--font-heading);
   --font-mono:
-    ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono",
-    "Courier New", monospace;
+    ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -224,7 +223,9 @@
   padding-top: 0.7rem !important;
   padding-bottom: 0.7rem !important;
   box-shadow: 0 2px 8px rgba(20, 40, 70, 0.05) !important;
-  transition: transform 0.1s ease, box-shadow 0.1s ease !important;
+  transition:
+    transform 0.1s ease,
+    box-shadow 0.1s ease !important;
 }
 
 [data-testid="time"]:hover {
@@ -246,6 +247,66 @@
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
+}
+
+/* Selected day → filled blue-gradient circle with glow (prototype). */
+.slotix-day-selected {
+  background: linear-gradient(135deg, #66a6ff, #5094f0) !important;
+  color: #fff !important;
+  border-color: transparent !important;
+  box-shadow: 0 8px 18px rgba(80, 148, 240, 0.35) !important;
+}
+
+/* Today (when not selected) → transparent fill with a blue ring outline (prototype). */
+.slotix-day-today:not(.slotix-day-selected) {
+  border-color: #5094f0 !important;
+  color: #1a2733 !important;
+}
+
+.dark .slotix-day-today:not(.slotix-day-selected) {
+  color: #e4ebf1 !important;
+}
+
+/* Booking success card → glass surface over the aurora background (prototype). */
+.slotix-success-card {
+  background: --alpha(var(--color-white) / 62%);
+  backdrop-filter: blur(32px) saturate(1.4);
+  -webkit-backdrop-filter: blur(32px) saturate(1.4);
+  border: 1px solid --alpha(var(--color-white) / 55%);
+  box-shadow: 0 20px 50px rgba(20, 40, 70, 0.1);
+}
+.dark .slotix-success-card {
+  background: --alpha(var(--color-black) / 40%);
+  border-color: --alpha(var(--color-white) / 8%);
+}
+
+/* Booking success badge → green-gradient circle with glow (prototype). */
+.slotix-success-badge {
+  background: linear-gradient(135deg, #4fd6a0, #3fcb6e) !important;
+  box-shadow: 0 12px 28px rgba(63, 203, 110, 0.4) !important;
+}
+
+/* Booking CTA buttons (confirm / pay / next) → blue gradient with glow (prototype). */
+[data-testid="confirm-book-button"],
+[data-testid="skip-confirm-book-button"][color="primary"],
+[data-testid="confirm-reschedule-button"] {
+  background-image: linear-gradient(135deg, #66a6ff, #5094f0) !important;
+  border-color: transparent !important;
+  box-shadow: 0 8px 22px rgba(80, 148, 240, 0.35) !important;
+}
+[data-testid="confirm-book-button"]:hover,
+[data-testid="skip-confirm-book-button"][color="primary"]:hover,
+[data-testid="confirm-reschedule-button"]:hover {
+  background-image: linear-gradient(135deg, #5b9bf5, #4589e8) !important;
+}
+
+/* Booking page host avatar → 64px circle with a thin blue ring (prototype). */
+.slotix-host-avatar li,
+.slotix-host-avatar li > * {
+  border-radius: 9999px !important;
+}
+.slotix-host-avatar li {
+  box-shadow: 0 0 0 1.5px #5094f0 !important;
 }
 
 .backdrop-blur-sm {

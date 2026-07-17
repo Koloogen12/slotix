@@ -111,8 +111,10 @@ export const BookEventForm = ({
 
   return (
     <div className="flex flex-col h-full">
+      {/* Slotix: the booking column stays a fixed width across steps, so cap the form content
+          width here — otherwise the inputs stretch across the whole (wide) column. */}
       <Form
-        className="flex flex-col h-full"
+        className="flex h-full max-w-[540px] flex-col"
         onChange={() => {
           // Form data is saved in store. This way when user navigates back to
           // still change the timeslot, and comes back to the form, all their values

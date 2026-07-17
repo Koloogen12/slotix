@@ -1,14 +1,12 @@
-import { shallow } from "zustand/shallow";
-
 import type { Dayjs } from "@calcom/dayjs";
 import dayjs from "@calcom/dayjs";
 import { useBookerStoreContext } from "@calcom/features/bookings/Booker/BookerStoreProvider";
+import { TimeFormatToggle } from "@calcom/features/bookings/components/TimeFormatToggle";
 import { useLocale } from "@calcom/lib/hooks/useLocale";
 import { nameOfDay } from "@calcom/lib/weekday";
 import { BookerLayouts } from "@calcom/prisma/zod-utils";
 import classNames from "@calcom/ui/classNames";
-
-import { TimeFormatToggle } from "@calcom/features/bookings/components/TimeFormatToggle";
+import { shallow } from "zustand/shallow";
 
 type AvailableTimesHeaderProps = {
   date: Dayjs;
@@ -32,6 +30,33 @@ export const AvailableTimesHeader = ({
   const isColumnView = layout === BookerLayouts.COLUMN_VIEW;
   const isMonthView = layout === BookerLayouts.MONTH_VIEW;
   const isToday = dayjs().isSame(date, "day");
+
+  // Slotix month view (booking page): full day label like "Пятница, 17 июля", plain text
+  // on the glass card — no white backing, no 12/24h toggle (matches the prototype).
+  if (isMonthView) {
+    const rawLabel = new Intl.DateTimeFormat(i18n.language, {
+      weekday: "long",
+      day: "numeric",
+      month: "long",
+    }).format(date.toDate());
+    const label = rawLabel.charAt(0).toUpperCase() + rawLabel.slice(1);
+
+    return (
+      <header
+        className={classNames(
+          "mb-4 flex w-full flex-row items-center",
+          customClassNames?.availableTimeSlotsHeaderContainer
+        )}>
+        <span
+          className={classNames(
+            "text-emphasis text-base font-semibold",
+            customClassNames?.availableTimeSlotsTitle
+          )}>
+          {label}
+        </span>
+      </header>
+    );
+  }
 
   return (
     <header

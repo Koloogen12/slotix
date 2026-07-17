@@ -69,11 +69,22 @@ export const EventMembers = ({
           },
         ];
 
+  const displayName = showOnlyProfileName
+    ? profile.name
+    : shownUsers
+        .map((user) => user.name)
+        .filter((name) => name)
+        .join(", ");
+
+  // Slotix: single host's bio doubles as the "role" subtitle under their name (prototype).
+  const roleSubtitle = !showOnlyProfileName && shownUsers.length === 1 ? shownUsers[0].bio : null;
+
+  // Slotix: host avatar (blue-ringed 64px circle) and name side by side, matching the prototype.
   return (
-    <>
+    <div className="flex items-center gap-4">
       <AvatarGroup
-        size="sm"
-        className="border-muted"
+        size="lg"
+        className="slotix-host-avatar border-muted"
         items={[
           ...orgOrTeamAvatarItem,
           ...shownUsers.map((user) => ({
@@ -88,14 +99,10 @@ export const EventMembers = ({
         ]}
       />
 
-      <p className="mt-2 font-semibold text-sm text-subtle">
-        {showOnlyProfileName
-          ? profile.name
-          : shownUsers
-              .map((user) => user.name)
-              .filter((name) => name)
-              .join(", ")}
-      </p>
-    </>
+      <div className="flex min-w-0 flex-col">
+        <p className="text-emphasis font-semibold text-base leading-tight">{displayName}</p>
+        {roleSubtitle && <p className="text-subtle mt-0.5 line-clamp-1 text-sm">{roleSubtitle}</p>}
+      </div>
+    </div>
   );
 };

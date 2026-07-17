@@ -1,9 +1,6 @@
-import { cubicBezier, useAnimate } from "framer-motion";
-import { useReducedMotion } from "framer-motion";
-import { useEffect } from "react";
-
 import { BookerLayouts } from "@calcom/prisma/zod-utils";
-
+import { cubicBezier, useAnimate, useReducedMotion } from "framer-motion";
+import { useEffect } from "react";
 import type { BookerLayout, BookerState } from "./types";
 
 // Framer motion fade in animation configs.
@@ -138,18 +135,20 @@ export const getBookerSizeClassNames = (
   return [
     // Size settings are abstracted on their own lines purely for readability.
     // General sizes, used always
-    "[--booker-timeslots-width:240px] lg:[--booker-timeslots-width:280px]",
+    // Slotix: wider timeslots column to match the booking-page prototype.
+    "[--booker-timeslots-width:280px] lg:[--booker-timeslots-width:326px]",
     // Small calendar defaults
-    layout === BookerLayouts.MONTH_VIEW && getBookerMetaClass("[--booker-meta-width:240px]"),
-    // Meta column gets wider in booking view to fit the full date on a single row in case
-    // of a multi occurrence event. Also makes form less wide, which also looks better.
+    layout === BookerLayouts.MONTH_VIEW && getBookerMetaClass("[--booker-meta-width:300px]"),
+    // Slotix: wide meta (host info) column, matching the prototype's 372px left panel.
     layout === BookerLayouts.MONTH_VIEW &&
       bookerState === "booking" &&
-      `[--booker-main-width:420px] ${getBookerMetaClass("lg:[--booker-meta-width:340px]")}`,
-    // Smaller meta when not in booking view.
+      // Slotix: keep the same total card width as the pick view (meta 372 + main 868 = 1240)
+      // so the card doesn't visibly shrink when moving from slots to the form.
+      `[--booker-main-width:868px] ${getBookerMetaClass("lg:[--booker-meta-width:372px]")}`,
+    // Slotix: wider calendar column in the pick view so the whole card matches the prototype (~1240px).
     layout === BookerLayouts.MONTH_VIEW &&
       bookerState !== "booking" &&
-      `[--booker-main-width:480px] ${getBookerMetaClass("lg:[--booker-meta-width:280px]")}`,
+      `[--booker-main-width:542px] ${getBookerMetaClass("lg:[--booker-meta-width:372px]")}`,
     // Fullscreen view settings.
     layout !== BookerLayouts.MONTH_VIEW &&
       `[--booker-main-width:480px] [--booker-meta-width:340px] ${getBookerMetaClass(

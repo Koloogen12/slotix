@@ -46,6 +46,7 @@ const userSelect = {
   avatarUrl: true,
   username: true,
   name: true,
+  bio: true,
   weekStart: true,
   brandColor: true,
   darkBrandColor: true,
@@ -346,6 +347,7 @@ export const getPublicEvent = async (
         name: user.name,
         username: user.username,
         avatarUrl: user.avatarUrl,
+        bio: user.bio,
         weekStart: user.weekStart,
         brandColor: user.brandColor,
         darkBrandColor: user.darkBrandColor,
@@ -675,12 +677,13 @@ export async function getUsersFromEvent(
   if (!owner) {
     return null;
   }
-  const { username, name, weekStart, profile, avatarUrl } = owner;
+  const { username, name, weekStart, profile, avatarUrl, bio } = owner;
   const organizationId = profile?.organization?.id ?? null;
   return [
     {
       username,
       name,
+      bio,
       weekStart,
       organizationId,
       avatarUrl,
@@ -699,6 +702,7 @@ async function getOwnerFromUsersArray(prisma: PrismaClient, eventTypeId: number)
           avatarUrl: true,
           username: true,
           name: true,
+          bio: true,
           weekStart: true,
           id: true,
         },
@@ -727,7 +731,7 @@ async function getOwnerFromUsersArray(prisma: PrismaClient, eventTypeId: number)
 }
 
 function mapHostsToUsers(host: {
-  user: Pick<UserType, "username" | "name" | "weekStart" | "avatarUrl"> & {
+  user: Pick<UserType, "username" | "name" | "weekStart" | "avatarUrl" | "bio"> & {
     profile: UserProfile;
   };
 }) {
@@ -735,6 +739,7 @@ function mapHostsToUsers(host: {
     username: host.user.username,
     name: host.user.name,
     avatarUrl: host.user.avatarUrl,
+    bio: host.user.bio,
     weekStart: host.user.weekStart,
     organizationId: host.user.profile?.organizationId ?? null,
     bookerUrl: getBookerBaseUrlSync(host.user.profile?.organization?.slug ?? null),

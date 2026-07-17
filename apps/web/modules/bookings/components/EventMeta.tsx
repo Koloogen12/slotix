@@ -1,7 +1,7 @@
 import { Timezone as PlatformTimezoneSelect } from "@calcom/atoms/timezone";
 import { useBookerStoreContext } from "@calcom/features/bookings/Booker/BookerStoreProvider";
-import { useBookerTime } from "@calcom/features/bookings/Booker/hooks/useBookerTime";
 import { fadeInUp } from "@calcom/features/bookings/Booker/config";
+import { useBookerTime } from "@calcom/features/bookings/Booker/hooks/useBookerTime";
 import type { Timezone } from "@calcom/features/bookings/Booker/types";
 import { FromToTime } from "@calcom/features/bookings/Booker/utils/dates";
 import { useTimePreferences } from "@calcom/features/bookings/lib";
@@ -164,6 +164,12 @@ export const EventMeta = ({
       )}
       {!isPending && !!event && (
         <m.div {...fadeInUp} layout transition={{ ...fadeInUp.transition, delay: 0.3 }}>
+          {/* Slotix: brand logo at the top of the booking card, matching the prototype. */}
+          <img
+            src="/slotix/slotix-logo.png"
+            alt="Slotix"
+            className="mb-8 h-7 w-auto object-contain object-left dark:brightness-0 dark:invert"
+          />
           <EventMembers
             schedulingType={event.schedulingType}
             users={event.subsetOfUsers}
@@ -173,23 +179,9 @@ export const EventMeta = ({
             roundRobinHideOrgAndTeam={roundRobinHideOrgAndTeam}
             hideOrgTeamAvatar={hideOrgTeamAvatar}
           />
-          <EventTitle className={`${classNames?.eventMetaTitle} my-2`}>
+          <EventTitle className={`${classNames?.eventMetaTitle} mb-7 mt-8`}>
             {translatedTitle ?? event?.title}
           </EventTitle>
-          {(event.description || translatedDescription) && (
-            <EventMetaBlock data-testid="event-meta-description" contentClassName="mb-8">
-              <ScrollableWithGradients
-                className="wrap-break-word scroll-bar max-h-[180px] max-w-full overflow-y-auto pr-4"
-                ariaLabel={t("description")}>
-                {/* biome-ignore lint/security/noDangerouslySetInnerHtml: Content is sanitized via markdownToSafeHTMLClient */}
-                <div
-                  dangerouslySetInnerHTML={{
-                    __html: markdownToSafeHTMLClient(translatedDescription ?? event.description),
-                  }}
-                />
-              </ScrollableWithGradients>
-            </EventMetaBlock>
-          )}
           <div className="stack-y-4 font-medium rtl:-mr-2">
             {rescheduleUid && bookingData && (
               <EventMetaBlock icon="calendar">
@@ -218,6 +210,21 @@ export const EventMeta = ({
               </EventMetaBlock>
             )}
             <EventDetails event={event} />
+            {/* Slotix: description sits below the detail rows, matching the prototype layout. */}
+            {(event.description || translatedDescription) && (
+              <EventMetaBlock data-testid="event-meta-description" contentClassName="mt-2 mb-4">
+                <ScrollableWithGradients
+                  className="wrap-break-word scroll-bar text-subtle max-h-[180px] max-w-full overflow-y-auto pr-4 text-sm leading-relaxed"
+                  ariaLabel={t("description")}>
+                  {/* biome-ignore lint/security/noDangerouslySetInnerHtml: Content is sanitized via markdownToSafeHTMLClient */}
+                  <div
+                    dangerouslySetInnerHTML={{
+                      __html: markdownToSafeHTMLClient(translatedDescription ?? event.description),
+                    }}
+                  />
+                </ScrollableWithGradients>
+              </EventMetaBlock>
+            )}
             <EventMetaBlock
               className="cursor-pointer [&_.current-timezone:before]:focus-within:opacity-100 [&_.current-timezone:before]:hover:opacity-100"
               contentClassName="relative max-w-[90%]"

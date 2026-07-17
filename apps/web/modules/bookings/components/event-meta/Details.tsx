@@ -129,7 +129,7 @@ export const EventMetaBlock = ({
  * <EventDetails event={event} blocks={[EventDetailBlocks.LOCATION, MyCustomBlock]} />
  */
 export const EventDetails = ({ event, blocks = defaultEventDetailsBlocks }: EventDetailsProps) => {
-  const { t } = useLocale();
+  const { t, i18n } = useLocale();
   const rescheduleUid = useBookerStore((state) => state.rescheduleUid);
 
   return (
@@ -190,6 +190,7 @@ export const EventDetails = ({ event, blocks = defaultEventDetailsBlocks }: Even
                   price={paymentAppData.price}
                   currency={event.currency}
                   displayAlternateSymbol={false}
+                  locale={i18n.language}
                 />
               </EventMetaBlock>
             );
