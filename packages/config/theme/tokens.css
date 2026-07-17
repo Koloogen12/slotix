@@ -245,15 +245,15 @@
   --cal-bg-muted: hsla(210, 20%, 97%, 1);
   --cal-bg-inverted: hsla(210, 30%, 4%, 1);
 
-  /* Background Primary */
-  --cal-bg-primary: hsla(214, 30%, 16%, 1);
-  --cal-bg-primary-emphasis: hsla(220, 6%, 25%, 1);
-  --cal-bg-primary-muted: hsla(220, 14%, 94%, 1);
+  /* Background Primary — Slotix brand blue, see design-reference/SCREEN-MAPPING.md */
+  --cal-bg-primary: #2f6fd0;
+  --cal-bg-primary-emphasis: #255fb8;
+  --cal-bg-primary-muted: #e4ecfa;
 
   /* Background Brand */
-  --cal-bg-brand: hsla(214, 30%, 16%, 1);
-  --cal-bg-brand-emphasis: hsla(220, 6%, 25%, 1);
-  --cal-bg-brand-muted: hsla(220, 14%, 94%, 1);
+  --cal-bg-brand: #2f6fd0;
+  --cal-bg-brand-emphasis: #255fb8;
+  --cal-bg-brand-muted: #e4ecfa;
 
   /* Background Semantic */
   --cal-bg-semantic-info-subtle: hsla(212, 88%, 97%, 1);
@@ -328,9 +328,9 @@
   --cal-text-attention: hsla(16, 62%, 28%, 1);
   --cal-text-error: hsla(0, 63%, 31%, 1);
 
-  /* Brand */
-  --cal-brand: hsla(221, 39%, 11%, 1);
-  --cal-brand-emphasis: hsla(0, 0%, 6%, 1);
+  /* Brand — Slotix blue */
+  --cal-brand: #2f6fd0;
+  --cal-brand-emphasis: #255fb8;
   --cal-brand-text: hsla(0, 0%, 100%, 1);
 
   /* Box Shadows */
@@ -452,9 +452,9 @@
   --cal-text-attention: hsla(37, 86%, 92%, 1);
   --cal-text-error: hsla(3, 66%, 93%, 1);
 
-  /* Brand */
-  --cal-brand: hsla(0, 0%, 100%, 1);
-  --cal-brand-emphasis: hsla(218, 11%, 65%, 1);
+  /* Brand — Slotix blue (dark theme) */
+  --cal-brand: #66a6ff;
+  --cal-brand-emphasis: #5094f0;
   --cal-brand-text: hsla(0, 0%, 0%, 1);
 
   /* Fill Colors */

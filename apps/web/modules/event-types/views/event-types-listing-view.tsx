@@ -534,7 +534,7 @@ export const InfiniteEventTypeList = ({
   });
 
   return (
-    <div className="flex flex-col overflow-hidden rounded-md border border-subtle bg-default">
+    <div className="glass flex flex-col overflow-hidden rounded-xl border-0">
       <ul ref={parent} className="static! w-full divide-y divide-subtle" data-testid="event-types">
         {pages.map((page, pageIdx) => {
           return page?.eventTypes?.map((type, index) => {

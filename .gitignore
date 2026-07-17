@@ -117,3 +117,6 @@ agents/devin-knowledge.json
 
 # pagefind
 _pagefind/
+
+# Slotix local dev logs
+design-reference/.nextdev*.log
