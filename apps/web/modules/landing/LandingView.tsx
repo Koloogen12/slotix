@@ -3,7 +3,6 @@
 // Slotix marketing landing — reproduces design_handoff_slotix/"Slotix - Лендинг" prototype.
 // Static marketing content + a branded login modal wired to the real NextAuth flow.
 import { ErrorCode } from "@calcom/features/auth/lib/ErrorCode";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
 import { useState } from "react";
@@ -173,7 +172,9 @@ const chatBubbleOut =
 export default function LandingView() {
   const router = useRouter();
   const [loginOpen, setLoginOpen] = useState(false);
-  const [authView, setAuthView] = useState<"login" | "reset" | "sent">("login");
+  const [authView, setAuthView] = useState<"login" | "reset" | "sent" | "register" | "register-sent">(
+    "login"
+  );
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -191,6 +192,42 @@ export default function LandingView() {
   };
   const loginWithGoogle = () => signIn("google", { callbackUrl: "/event-types" });
   const loginWithYandex = () => signIn("yandex", { callbackUrl: "/event-types" });
+
+  // Slotix registration = auth (Google / Yandex / email magic-link) → straight into our
+  // /getting-started onboarding, which doubles as the sign-up step. No separate Cal.com form.
+  const REG_CALLBACK = "/getting-started";
+  const openRegister = () => {
+    setAuthView("register");
+    setError(null);
+    setLoginOpen(true);
+  };
+  const registerWithGoogle = () => signIn("google", { callbackUrl: REG_CALLBACK });
+  const registerWithYandex = () => signIn("yandex", { callbackUrl: REG_CALLBACK });
+  const registerWithEmail = async () => {
+    const value = email.trim();
+    if (!value.includes("@")) return setError("Введите корректный email");
+    setError(null);
+    setLoading(true);
+    try {
+      await signIn("email", { email: value, callbackUrl: REG_CALLBACK, redirect: false });
+      setAuthView("register-sent");
+    } catch {
+      setError("Не удалось отправить письмо. Попробуйте ещё раз.");
+    } finally {
+      setLoading(false);
+    }
+  };
+  // Hero / CTA "Начать бесплатно": open the modal in register mode; if an email was already
+  // typed, send the magic link immediately and jump to the confirmation screen.
+  const startRegisterFromHero = async () => {
+    setError(null);
+    setLoginOpen(true);
+    if (email.trim().includes("@")) {
+      await registerWithEmail();
+    } else {
+      setAuthView("register");
+    }
+  };
   const loginWithCredentials = async () => {
     setError(null);
     setLoading(true);
@@ -303,19 +340,22 @@ export default function LandingView() {
               }}>
               Вход
             </button>
-            <Link
-              href="/signup"
+            <button
+              type="button"
+              onClick={openRegister}
               className="sx-cta"
               style={{
                 font: "600 14px 'Golos Text'",
                 color: "#fff",
                 padding: "10px 20px",
                 borderRadius: 11,
+                border: "none",
+                cursor: "pointer",
                 background: "linear-gradient(135deg,#66A6FF,#5094F0)",
                 boxShadow: "0 8px 20px rgba(80,148,240,.32)",
               }}>
               Регистрация
-            </Link>
+            </button>
           </div>
         </div>
       </div>
@@ -386,6 +426,12 @@ export default function LandingView() {
             <input
               className="sx-input"
               placeholder="Введите ваш e-mail"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") startRegisterFromHero();
+              }}
               style={{
                 flex: "1 1 220px",
                 minWidth: 0,
@@ -401,8 +447,9 @@ export default function LandingView() {
                 outline: "none",
               }}
             />
-            <Link
-              href="/signup"
+            <button
+              type="button"
+              onClick={startRegisterFromHero}
               className="sx-cta"
               style={{
                 flex: "0 0 auto",
@@ -412,6 +459,8 @@ export default function LandingView() {
                 gap: 9,
                 padding: "16px 26px",
                 borderRadius: 14,
+                border: "none",
+                cursor: "pointer",
                 background: "linear-gradient(135deg,#66A6FF,#5094F0)",
                 color: "#fff",
                 font: "700 16px 'Golos Text'",
@@ -419,7 +468,7 @@ export default function LandingView() {
               }}>
               Начать бесплатно
               <ArrowRight />
-            </Link>
+            </button>
           </div>
           <div
             style={{
@@ -1308,6 +1357,12 @@ export default function LandingView() {
             <input
               className="sx-input"
               placeholder="Введите ваш e-mail"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") startRegisterFromHero();
+              }}
               style={{
                 flex: "1 1 220px",
                 minWidth: 0,
@@ -1321,8 +1376,9 @@ export default function LandingView() {
                 outline: "none",
               }}
             />
-            <Link
-              href="/signup"
+            <button
+              type="button"
+              onClick={startRegisterFromHero}
               style={{
                 flex: "0 0 auto",
                 display: "flex",
@@ -1331,13 +1387,15 @@ export default function LandingView() {
                 gap: 9,
                 padding: "16px 26px",
                 borderRadius: 14,
+                border: "none",
+                cursor: "pointer",
                 background: "#1A1C1E",
                 color: "#fff",
                 font: "700 16px 'Golos Text'",
                 boxShadow: "0 12px 28px rgba(20,30,45,.2)",
               }}>
               Начать бесплатно
-            </Link>
+            </button>
           </div>
           <div style={{ font: "500 14px 'Golos Text'", color: "#8E97A4" }}>
             Без привязки карты · Отмена в любой момент
@@ -1693,9 +1751,202 @@ export default function LandingView() {
                     color: "#8E97A4",
                   }}>
                   Нет аккаунта?{" "}
-                  <Link href="/signup" style={{ fontWeight: 600, color: "#2F6FD0" }}>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setError(null);
+                      setAuthView("register");
+                    }}
+                    style={{
+                      fontWeight: 600,
+                      color: "#2F6FD0",
+                      background: "none",
+                      border: "none",
+                      padding: 0,
+                      cursor: "pointer",
+                      font: "600 14px 'Golos Text'",
+                    }}>
                     Зарегистрироваться
-                  </Link>
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {authView === "register" && (
+              <div>
+                <h3
+                  style={{
+                    textAlign: "center",
+                    font: "800 24px 'Golos Text'",
+                    letterSpacing: "-.01em",
+                    color: "#1A1C1E",
+                    margin: "0 0 6px",
+                  }}>
+                  Создайте аккаунт
+                </h3>
+                <p
+                  style={{
+                    textAlign: "center",
+                    font: "400 14.5px 'Golos Text'",
+                    color: "#8E97A4",
+                    margin: "0 0 26px",
+                  }}>
+                  Регистрация за минуту — дальше настроим профиль
+                </p>
+                <button
+                  type="button"
+                  onClick={registerWithGoogle}
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    gap: 11,
+                    width: "100%",
+                    boxSizing: "border-box",
+                    padding: 13,
+                    border: "1px solid #D6DEE9",
+                    borderRadius: 13,
+                    background: "#fff",
+                    color: "#1A1C1E",
+                    font: "600 14.5px 'Golos Text'",
+                    cursor: "pointer",
+                  }}>
+                  <svg width="18" height="18" viewBox="0 0 24 24">
+                    <path
+                      fill="#4285F4"
+                      d="M22.5 12.2c0-.7-.1-1.4-.2-2H12v3.8h5.9a5 5 0 0 1-2.2 3.3v2.7h3.6c2.1-2 3.2-4.8 3.2-7.8z"
+                    />
+                    <path
+                      fill="#34A853"
+                      d="M12 23c2.9 0 5.4-1 7.2-2.6l-3.6-2.7c-1 .7-2.3 1-3.6 1-2.8 0-5.1-1.9-6-4.4H2.3v2.8A11 11 0 0 0 12 23z"
+                    />
+                    <path fill="#FBBC05" d="M6 14.3a6.6 6.6 0 0 1 0-4.2V7.3H2.3a11 11 0 0 0 0 9.8L6 14.3z" />
+                    <path
+                      fill="#EA4335"
+                      d="M12 5.4c1.6 0 3 .5 4.1 1.6l3.1-3.1A11 11 0 0 0 12 1a11 11 0 0 0-9.7 6l3.7 2.8c.9-2.5 3.2-4.4 6-4.4z"
+                    />
+                  </svg>
+                  Продолжить с Google
+                </button>
+                <button
+                  type="button"
+                  onClick={registerWithYandex}
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    gap: 11,
+                    width: "100%",
+                    boxSizing: "border-box",
+                    marginTop: 10,
+                    padding: 13,
+                    border: "1px solid #D6DEE9",
+                    borderRadius: 13,
+                    background: "#fff",
+                    color: "#1A1C1E",
+                    font: "600 14.5px 'Golos Text'",
+                    cursor: "pointer",
+                  }}>
+                  <svg width="18" height="18" viewBox="0 0 24 24">
+                    <circle cx="12" cy="12" r="12" fill="#FC3F1D" />
+                    <path
+                      fill="#fff"
+                      d="M13.3 6.4h-1.5c-1.9 0-3.3 1.2-3.3 3 0 1.4.7 2.2 2 3.1L8 17.6h1.8l2-3.6h.9v3.6h1.6V6.4h-1zm-1 6.2h-.5c-1 0-1.7-.5-1.7-1.8 0-1.3.8-1.8 1.7-1.8h.5v3.6z"
+                    />
+                  </svg>
+                  Продолжить с Yandex ID
+                </button>
+                <div style={{ display: "flex", alignItems: "center", gap: 14, margin: "20px 0" }}>
+                  <span style={{ flex: 1, height: 1, background: "rgba(20,30,45,.1)" }} />
+                  <span style={{ font: "500 12.5px 'Golos Text'", color: "#8E97A4" }}>или по email</span>
+                  <span style={{ flex: 1, height: 1, background: "rgba(20,30,45,.1)" }} />
+                </div>
+                <form
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    registerWithEmail();
+                  }}>
+                  <label
+                    style={{
+                      display: "block",
+                      font: "600 13px 'Golos Text'",
+                      color: "#1A1C1E",
+                      marginBottom: 7,
+                    }}>
+                    Email
+                  </label>
+                  <input
+                    className="sx-input"
+                    type="email"
+                    required
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="you@mail.ru"
+                    style={{
+                      width: "100%",
+                      boxSizing: "border-box",
+                      padding: "13px 15px",
+                      borderRadius: 12,
+                      border: "1px solid #D6DEE9",
+                      background: "rgba(255,255,255,.85)",
+                      font: "400 15px 'Golos Text'",
+                      color: "#1A1C1E",
+                      outline: "none",
+                    }}
+                  />
+                  {error && (
+                    <div style={{ marginTop: 14, font: "500 13.5px 'Golos Text'", color: "#D14343" }}>
+                      {error}
+                    </div>
+                  )}
+                  <button
+                    type="submit"
+                    disabled={loading}
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      width: "100%",
+                      boxSizing: "border-box",
+                      marginTop: 22,
+                      padding: 15,
+                      border: "none",
+                      borderRadius: 13,
+                      background: "linear-gradient(135deg,#66A6FF,#5094F0)",
+                      color: "#fff",
+                      font: "700 15px 'Golos Text'",
+                      cursor: loading ? "default" : "pointer",
+                      opacity: loading ? 0.7 : 1,
+                      boxShadow: "0 12px 28px rgba(80,148,240,.36)",
+                    }}>
+                    {loading ? "Отправляем…" : "Получить ссылку для входа"}
+                  </button>
+                </form>
+                <div
+                  style={{
+                    textAlign: "center",
+                    marginTop: 20,
+                    font: "400 14px 'Golos Text'",
+                    color: "#8E97A4",
+                  }}>
+                  Уже есть аккаунт?{" "}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setError(null);
+                      setAuthView("login");
+                    }}
+                    style={{
+                      fontWeight: 600,
+                      color: "#2F6FD0",
+                      background: "none",
+                      border: "none",
+                      padding: 0,
+                      cursor: "pointer",
+                      font: "600 14px 'Golos Text'",
+                    }}>
+                    Войти
+                  </button>
                 </div>
               </div>
             )}
@@ -1799,7 +2050,7 @@ export default function LandingView() {
               </div>
             )}
 
-            {authView === "sent" && (
+            {(authView === "sent" || authView === "register-sent") && (
               <div style={{ textAlign: "center" }}>
                 <div
                   style={{
@@ -1836,8 +2087,9 @@ export default function LandingView() {
                   Проверьте почту
                 </h3>
                 <p style={{ font: "400 14.5px/1.55 'Golos Text'", color: "#8E97A4", margin: "0 0 26px" }}>
-                  Если аккаунт с таким email существует, мы отправили ссылку для смены пароля. Не пришло —
-                  проверьте папку «Спам».
+                  {authView === "register-sent"
+                    ? "Мы отправили ссылку для входа на вашу почту. Откройте письмо, чтобы завершить регистрацию и настроить профиль."
+                    : "Если аккаунт с таким email существует, мы отправили ссылку для смены пароля. Не пришло — проверьте папку «Спам»."}
                 </p>
                 <button
                   type="button"
