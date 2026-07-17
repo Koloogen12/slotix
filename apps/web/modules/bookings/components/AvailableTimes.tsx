@@ -171,15 +171,7 @@ const SlotItem = ({
             `${customClassNames}`
           )}
           color="secondary">
-          <div className="flex items-center gap-2">
-            {!hasTimeSlots && overlayCalendarToggled && (
-              <span
-                className={classNames(
-                  "inline-block h-2 w-2 rounded-full",
-                  isOverlapping ? "bg-rose-600" : "bg-emerald-400"
-                )}
-              />
-            )}
+          <div className="flex items-center justify-center gap-2">
             {computedDateWithUsersTimezone.format(timeFormat)}
           </div>
           {bookingFull && <p className="text-sm">{t("booking_full")}</p>}

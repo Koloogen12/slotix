@@ -90,7 +90,8 @@ const Day = ({
           : !disabled
             ? `${
                 !customClassName?.dayActive
-                  ? "hover:border-brand-default text-emphasis bg-emphasis"
+                  ? // Slotix: available days are plain numbers; grey fill only on hover, today gets a ring
+                    `text-emphasis hover:bg-emphasis ${date.isToday() ? "border-brand-default" : ""}`
                   : `hover:border-brand-default ${customClassName.dayActive}`
               }`
             : `${customClassName ? "" : " text-mute"}`
@@ -101,15 +102,6 @@ const Day = ({
       {...props}>
       {away && <span data-testid="away-emoji">{emoji}</span>}
       {!away && date.date()}
-      {date.isToday() && (
-        <span
-          className={classNames(
-            "bg-brand-default absolute left-1/2 top-1/2 flex h-[5px] w-[5px] -translate-x-1/2 translate-y-[8px] items-center justify-center rounded-full align-middle sm:translate-y-[12px]",
-            active && "bg-brand-accent"
-          )}>
-          <span className="sr-only">{t("today")}</span>
-        </span>
-      )}
     </button>
   );
 
@@ -406,23 +398,41 @@ const DatePicker = ({
       onMonthChange(browsingDate.add(newMonth, "month"));
     }
   };
-  const month = browsingDate
+  const rawMonth = browsingDate
     ? new Intl.DateTimeFormat(i18n.language, { month: "long" }).format(
         new Date(browsingDate.year(), browsingDate.month())
       )
     : null;
+  // Slotix: capitalize the month name (RU Intl returns it lowercased)
+  const month = rawMonth ? rawMonth.charAt(0).toUpperCase() + rawMonth.slice(1) : null;
 
   return (
     <div className={className}>
-      <div className="mb-1 flex items-center justify-between text-xl">
-        <span className="text-default w-1/2 text-base">
+      {/* Slotix: centered month title with a nav arrow on each side, like the prototype */}
+      <div className="mb-3 flex items-center justify-between text-xl">
+        <Button
+          className={classNames(
+            `group rounded-full border border-subtle p-1 opacity-80 transition hover:opacity-100 rtl:rotate-180`,
+            !browsingDate.isAfter(dayjs()) &&
+              `disabled:text-bookinglighter hover:bg-background hover:opacity-70`,
+            customClassNames?.datePickerToggle
+          )}
+          onClick={() => changeMonth(-1)}
+          disabled={!browsingDate.isAfter(dayjs())}
+          data-testid="decrementMonth"
+          color="minimal"
+          variant="icon"
+          StartIcon="chevron-left"
+          aria-label={t("view_previous_month")}
+        />
+        <span className="text-default text-center text-base">
           {browsingDate ? (
             <time dateTime={browsingDate.format("YYYY-MM")} data-testid="selected-month-label">
               <strong
                 className={classNames(`text-emphasis font-semibold`, customClassNames?.datePickerTitle)}>
                 {month}
               </strong>{" "}
-              <span className={classNames(`text-subtle font-medium`, customClassNames?.datePickerTitle)}>
+              <span className={classNames(`text-emphasis font-semibold`, customClassNames?.datePickerTitle)}>
                 {browsingDate.format("YYYY")}
               </span>
             </time>
@@ -430,37 +440,18 @@ const DatePicker = ({
             <SkeletonText className="h-8 w-24" />
           )}
         </span>
-        <div className="text-emphasis">
-          <div className="flex">
-            <Button
-              className={classNames(
-                `group p-1 opacity-70 transition hover:opacity-100 rtl:rotate-180`,
-                !browsingDate.isAfter(dayjs()) &&
-                  `disabled:text-bookinglighter hover:bg-background hover:opacity-70`,
-                customClassNames?.datePickerToggle
-              )}
-              onClick={() => changeMonth(-1)}
-              disabled={!browsingDate.isAfter(dayjs())}
-              data-testid="decrementMonth"
-              color="minimal"
-              variant="icon"
-              StartIcon="chevron-left"
-              aria-label={t("view_previous_month")}
-            />
-            <Button
-              className={classNames(
-                `group p-1 opacity-70 transition hover:opacity-100 rtl:rotate-180`,
-                `${customClassNames?.datePickerToggle}`
-              )}
-              onClick={() => changeMonth(+1)}
-              data-testid="incrementMonth"
-              color="minimal"
-              variant="icon"
-              StartIcon="chevron-right"
-              aria-label={t("view_next_month")}
-            />
-          </div>
-        </div>
+        <Button
+          className={classNames(
+            `group rounded-full border border-subtle p-1 opacity-80 transition hover:opacity-100 rtl:rotate-180`,
+            `${customClassNames?.datePickerToggle}`
+          )}
+          onClick={() => changeMonth(+1)}
+          data-testid="incrementMonth"
+          color="minimal"
+          variant="icon"
+          StartIcon="chevron-right"
+          aria-label={t("view_next_month")}
+        />
       </div>
       <div className="border-subtle mb-2 grid grid-cols-7 gap-4 border-b border-t text-center md:mb-0 md:border-0">
         {weekdayNames(locale, weekStart, "short").map((weekDay) => (
