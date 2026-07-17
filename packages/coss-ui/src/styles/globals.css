@@ -188,6 +188,27 @@
   border: 1px solid --alpha(var(--color-white) / 8%);
 }
 
+/*
+  Slotix content cards → glass. In cal.diy, `border-subtle` marks content-card
+  surfaces (sections, list containers, panels); form inputs use `border-input`,
+  so this does not touch them. Applied globally so every cabinet/settings card
+  becomes glass without per-component edits.
+*/
+.bg-default.border-subtle,
+.bg-default.divide-subtle {
+  background-color: --alpha(var(--color-white) / 62%) !important;
+  backdrop-filter: blur(var(--glass-blur)) saturate(1.4);
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(1.4);
+  border-color: --alpha(var(--color-white) / 55%) !important;
+  box-shadow: var(--shadow-ambient);
+}
+
+.dark .bg-default.border-subtle,
+.dark .bg-default.divide-subtle {
+  background-color: --alpha(var(--color-black) / 40%) !important;
+  border-color: --alpha(var(--color-white) / 8%) !important;
+}
+
 .backdrop-blur-sm {
   @apply backdrop-blur-none bg-black/70;
 }
