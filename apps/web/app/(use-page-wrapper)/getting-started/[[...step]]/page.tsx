@@ -1,18 +1,16 @@
-import { createRouterCaller } from "app/_trpc/context";
 import type { PageProps as ServerPageProps } from "app/_types";
 import { _generateMetadata } from "app/_utils";
 import { cookies, headers } from "next/headers";
 import { redirect } from "next/navigation";
 
 import { getServerSession } from "@calcom/features/auth/lib/getServerSession";
-import { UserRepository } from "@calcom/features/users/repositories/UserRepository";
 import { APP_NAME } from "@calcom/lib/constants";
-import prisma from "@calcom/prisma";
-import { meRouter } from "@calcom/trpc/server/routers/viewer/me/_router";
 
 import { buildLegacyRequest } from "@lib/buildLegacyCtx";
 
-import Page from "~/getting-started/[[...step]]/onboarding-view";
+// Slotix: use the custom prototype onboarding regardless of the `onboarding-v3` flag,
+// so this legacy route shows the same aurora-glass two-step screen as /onboarding/getting-started.
+import SlotixOnboarding from "~/onboarding/getting-started/SlotixOnboarding";
 
 export const generateMetadata = async ({ params }: ServerPageProps) => {
   const stepParam = (await params).step;
@@ -26,28 +24,14 @@ export const generateMetadata = async ({ params }: ServerPageProps) => {
   );
 };
 
-const ServerPage = async ({ params, searchParams }: ServerPageProps) => {
+const ServerPage = async () => {
   const session = await getServerSession({ req: buildLegacyRequest(await headers(), await cookies()) });
 
   if (!session?.user?.id) {
     return redirect("/auth/login");
   }
 
-  const userRepo = new UserRepository(prisma);
-  const meCaller = await createRouterCaller(meRouter);
-
-  const [userTeams, user] = await Promise.all([
-    userRepo.findUserTeams({
-      id: session.user.id,
-    }),
-    meCaller.get(),
-  ]);
-
-  if (!userTeams || !user) {
-    return redirect("/auth/login");
-  }
-
-  return <Page user={user} hasPendingInvites={!!userTeams.teams.find((team) => team.accepted === false)} />;
+  return <SlotixOnboarding />;
 };
 
 export default ServerPage;
