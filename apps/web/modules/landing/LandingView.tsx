@@ -190,6 +190,7 @@ export default function LandingView() {
     setError(null);
   };
   const loginWithGoogle = () => signIn("google", { callbackUrl: "/event-types" });
+  const loginWithYandex = () => signIn("yandex", { callbackUrl: "/event-types" });
   const loginWithCredentials = async () => {
     setError(null);
     setLoading(true);
@@ -1542,6 +1543,34 @@ export default function LandingView() {
                     />
                   </svg>
                   Войти с помощью Google
+                </button>
+                <button
+                  type="button"
+                  onClick={loginWithYandex}
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    gap: 11,
+                    width: "100%",
+                    boxSizing: "border-box",
+                    marginTop: 10,
+                    padding: 13,
+                    border: "1px solid #D6DEE9",
+                    borderRadius: 13,
+                    background: "#fff",
+                    color: "#1A1C1E",
+                    font: "600 14.5px 'Golos Text'",
+                    cursor: "pointer",
+                  }}>
+                  <svg width="18" height="18" viewBox="0 0 24 24">
+                    <circle cx="12" cy="12" r="12" fill="#FC3F1D" />
+                    <path
+                      fill="#fff"
+                      d="M13.3 6.4h-1.5c-1.9 0-3.3 1.2-3.3 3 0 1.4.7 2.2 2 3.1L8 17.6h1.8l2-3.6h.9v3.6h1.6V6.4h-1zm-1 6.2h-.5c-1 0-1.7-.5-1.7-1.8 0-1.3.8-1.8 1.7-1.8h.5v3.6z"
+                    />
+                  </svg>
+                  Войти с Yandex ID
                 </button>
                 <div style={{ display: "flex", alignItems: "center", gap: 14, margin: "20px 0" }}>
                   <span style={{ flex: 1, height: 1, background: "rgba(20,30,45,.1)" }} />

@@ -49,6 +49,7 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import EmailProvider from "next-auth/providers/email";
 import GoogleProvider from "next-auth/providers/google";
 import type { Provider } from "next-auth/providers/index";
+import YandexProvider from "next-auth/providers/yandex";
 import { getOrgUsernameFromEmail } from "../signup/utils/getOrgUsernameFromEmail";
 import { dub } from "./dub";
 import { ErrorCode } from "./ErrorCode";
@@ -100,6 +101,12 @@ const { client_id: GOOGLE_CLIENT_ID, client_secret: GOOGLE_CLIENT_SECRET } =
   JSON.parse(GOOGLE_API_CREDENTIALS)?.web || {};
 const GOOGLE_LOGIN_ENABLED = process.env.GOOGLE_LOGIN_ENABLED === "true";
 const IS_GOOGLE_LOGIN_ENABLED = !!(GOOGLE_CLIENT_ID && GOOGLE_CLIENT_SECRET && GOOGLE_LOGIN_ENABLED);
+// Slotix: Yandex ID login (RU). Uses next-auth's built-in Yandex provider — callback
+// path /api/auth/callback/yandex, scopes login:info + login:email.
+const YANDEX_CLIENT_ID = process.env.YANDEX_CLIENT_ID;
+const YANDEX_CLIENT_SECRET = process.env.YANDEX_CLIENT_SECRET;
+const YANDEX_LOGIN_ENABLED = process.env.YANDEX_LOGIN_ENABLED === "true";
+const IS_YANDEX_LOGIN_ENABLED = !!(YANDEX_CLIENT_ID && YANDEX_CLIENT_SECRET && YANDEX_LOGIN_ENABLED);
 const ORGANIZATIONS_AUTOLINK =
   process.env.ORGANIZATIONS_AUTOLINK === "1" || process.env.ORGANIZATIONS_AUTOLINK === "true";
 
@@ -326,6 +333,16 @@ if (IS_GOOGLE_LOGIN_ENABLED) {
           prompt: "consent",
         },
       },
+    })
+  );
+}
+
+if (IS_YANDEX_LOGIN_ENABLED) {
+  providers.push(
+    YandexProvider({
+      clientId: YANDEX_CLIENT_ID,
+      clientSecret: YANDEX_CLIENT_SECRET,
+      allowDangerousEmailAccountLinking: true,
     })
   );
 }
