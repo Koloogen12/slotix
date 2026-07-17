@@ -1,0 +1,10 @@
+# Slotix reverse proxy — auto TLS via Let's Encrypt.
+# DNS: slotix.neurin.tech A -> this server's public IP (already set on Cloudflare).
+# If Cloudflare proxy (orange cloud) is ON, set SSL/TLS mode to "Full (strict)"
+# so Caddy's origin cert is trusted; or turn the proxy OFF (grey cloud) to let
+# Caddy issue the public cert directly.
+
+slotix.neurin.tech {
+	encode zstd gzip
+	reverse_proxy app:3000
+}
