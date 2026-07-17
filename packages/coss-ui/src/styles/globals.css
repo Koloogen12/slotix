@@ -239,6 +239,15 @@
   color: #e4ebf1 !important;
 }
 
+/* Booking calendar day cells → circular, like the prototype. */
+.absolute.rounded-md.border-2.border-transparent {
+  border-radius: 9999px !important;
+  aspect-ratio: 1 / 1 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
 .backdrop-blur-sm {
   @apply backdrop-blur-none bg-black/70;
 }
