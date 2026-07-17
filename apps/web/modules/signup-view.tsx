@@ -373,14 +373,16 @@ export default function Signup({
           />
         </>
       ) : null}
+      {/* Slotix: aurora-glass sign-up screen with the blue brand instead of Cal.com's grey/black. */}
       <div
         className={classNames(
-          "light flex min-h-screen w-full flex-col items-center justify-center bg-cal-muted [--cal-brand:#111827] 2xl:bg-default dark:[--cal-brand:#FFFFFF]",
-          "[--cal-brand-subtle:#9CA3AF]",
-          "[--cal-brand-text:#FFFFFF] dark:[--cal-brand-text:#000000]",
-          "[--cal-brand-emphasis:#101010] dark:[--cal-brand-emphasis:#e1e1e1]"
-        )}>
-        <div className="grid w-full max-w-[1440px] grid-cols-1 grid-rows-1 overflow-hidden bg-cal-muted lg:grid-cols-2 2xl:rounded-[20px] 2xl:border 2xl:border-subtle 2xl:py-6">
+          "light flex min-h-screen w-full flex-col items-center justify-center",
+          "[--cal-brand:#5094f0] [--cal-brand-emphasis:#2f6fd0] [--cal-brand-subtle:#9cadbf] [--cal-brand-text:#ffffff]"
+        )}
+        style={{
+          background: "#eaf2fb url(/slotix/aurora-bg.png) center / cover no-repeat fixed",
+        }}>
+        <div className="grid w-full max-w-[1440px] grid-cols-1 grid-rows-1 overflow-hidden lg:grid-cols-2 2xl:rounded-[20px] 2xl:py-6">
           {/* Left side */}
           <div className="mt-0 mr-auto ml-auto flex w-full max-w-xl flex-col px-4 pt-6 sm:px-16 md:px-20 lg:mt-24 2xl:px-28">
             {accountUnderReview ? (
@@ -770,7 +772,7 @@ export default function Signup({
               </>
             )}
           </div>
-          <div className="mx-auto mt-24 w-full max-w-2xl flex-col justify-between rounded-l-2xl border-subtle pl-4 lg:mt-0 lg:flex lg:max-w-full lg:border lg:bg-subtle lg:py-12 lg:pl-12 dark:bg-none">
+          <div className="mx-auto mt-24 w-full max-w-2xl flex-col justify-between rounded-l-2xl pl-4 lg:mt-0 lg:flex lg:max-w-full lg:rounded-l-[28px] lg:border lg:border-white/50 lg:bg-white/45 lg:py-12 lg:pl-12 lg:backdrop-blur-2xl">
             {IS_CALCOM && (
               <>
                 <div className="-mt-4 mr-12 mb-6 grid w-full grid-cols-3 gap-5 pr-4 sm:gap-3 lg:grid-cols-4">
@@ -827,13 +829,13 @@ export default function Signup({
                 </div>
               </>
             )}
-            <div className="hidden rounded-tl-2xl rounded-br-none rounded-bl-2xl border border-default border-r-0 border-dashed bg-black/3 lg:block lg:py-[6px] lg:pl-[6px] dark:bg-white/5">
-              <img className="block dark:hidden" src="/mock-event-type-list.svg" alt="Cal.diy Booking Page" />
+            {/* Slotix: brand visual instead of the Cal.com mock booking page */}
+            <div className="mr-12 hidden lg:block">
               {/* eslint-disable @next/next/no-img-element */}
               <img
-                className="hidden dark:block"
-                src="/mock-event-type-list-dark.svg"
-                alt="Cal.diy Booking Page"
+                className="pointer-events-none w-full max-w-xl object-contain"
+                src="/slotix/hero-glass.png"
+                alt="Slotix"
               />
             </div>
             <div className="mt-8 mr-12 hidden h-full w-full grid-cols-3 gap-4 overflow-hidden lg:grid">

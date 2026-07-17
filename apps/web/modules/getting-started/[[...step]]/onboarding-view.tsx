@@ -150,12 +150,12 @@ const OnboardingPage = (props: PageProps) => {
   return (
     <div
       className={classNames(
-        "text-emphasis min-h-screen [--cal-brand:#111827] dark:[--cal-brand:#FFFFFF]",
-        "[--cal-brand-emphasis:#101010] dark:[--cal-brand-emphasis:#e1e1e1]",
-        "[--cal-brand-subtle:#9CA3AF]",
-        "[--cal-brand-text:#FFFFFF]  dark:[--cal-brand-text:#000000]",
-        "[--cal-brand-accent:#FFFFFF] dark:[--cal-brand-accent:#000000]"
+        "text-emphasis min-h-screen",
+        // Slotix: aurora background + blue brand instead of Cal.com's grey/black.
+        "[--cal-brand:#5094f0] [--cal-brand-emphasis:#2f6fd0] [--cal-brand-subtle:#9cadbf]",
+        "[--cal-brand-text:#ffffff] [--cal-brand-accent:#ffffff]"
       )}
+      style={{ background: "#eaf2fb url(/slotix/aurora-bg.png) center / cover no-repeat fixed" }}
       data-testid="onboarding"
       key={pathname}>
       <div className="mx-auto py-6 sm:px-4 md:py-24">
