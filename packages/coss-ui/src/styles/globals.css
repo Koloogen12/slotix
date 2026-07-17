@@ -209,6 +209,36 @@
   border-color: --alpha(var(--color-white) / 8%) !important;
 }
 
+/*
+  Public booking page (Booker) — match the Slotix prototype:
+  full-width rounded slot pills, solid-blue selected/confirm state.
+*/
+[data-testid="time"] {
+  width: 100% !important;
+  justify-content: center !important;
+  border-radius: 12px !important;
+  background-color: --alpha(var(--color-white) / 78%) !important;
+  border: 1px solid --alpha(var(--color-white) / 70%) !important;
+  color: #1a2733 !important;
+  font-weight: 600 !important;
+  padding-top: 0.7rem !important;
+  padding-bottom: 0.7rem !important;
+  box-shadow: 0 2px 8px rgba(20, 40, 70, 0.05) !important;
+  transition: transform 0.1s ease, box-shadow 0.1s ease !important;
+}
+
+[data-testid="time"]:hover {
+  transform: translateY(-1px) !important;
+  box-shadow: 0 6px 16px rgba(80, 148, 240, 0.16) !important;
+  border-color: var(--cal-brand) !important;
+}
+
+.dark [data-testid="time"] {
+  background-color: --alpha(var(--color-white) / 8%) !important;
+  border-color: --alpha(var(--color-white) / 12%) !important;
+  color: #e4ebf1 !important;
+}
+
 .backdrop-blur-sm {
   @apply backdrop-blur-none bg-black/70;
 }
