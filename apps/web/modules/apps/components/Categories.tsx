@@ -36,7 +36,7 @@ export function AppStoreCategories({
             href={`/apps/categories/${category.name}`}
             data-testid={`app-store-category-${category.name}`}
             className="relative flex rounded-md"
-            style={{ background: "radial-gradient(farthest-side at top right, #a2abbe 0%, #E3E3E3 100%)" }}>
+            style={{ background: "radial-gradient(farthest-side at top right, #cfe0f7 0%, #eaf2fb 100%)" }}>
             <div className="dark:bg-cal-muted light:bg-[url('/noise.svg')] dark:from-subtle dark:to-muted w-full self-center bg-cover bg-center bg-no-repeat px-6 py-4 dark:bg-linear-to-tr">
               <Image
                 src={`/app-categories/${category.name}.svg`}
