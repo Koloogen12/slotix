@@ -209,6 +209,21 @@
 }
 
 /*
+  Slotix cabinet: `bg-cal-muted` is the shared "muted container" surface across the
+  dashboard shell (settings sidebar, bookings list, panels). Turn it into glass so the
+  whole cabinet sits on the aurora. Only the literal class matches — Tailwind's
+  `hover:bg-cal-muted` compiles to `.hover\:bg-cal-muted`, so row hovers are untouched.
+*/
+.bg-cal-muted {
+  background-color: --alpha(var(--color-white) / 55%) !important;
+  backdrop-filter: blur(var(--glass-blur)) saturate(1.4);
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(1.4);
+}
+.dark .bg-cal-muted {
+  background-color: --alpha(var(--color-black) / 35%) !important;
+}
+
+/*
   Public booking page (Booker) — match the Slotix prototype:
   full-width rounded slot pills, solid-blue selected/confirm state.
 */
