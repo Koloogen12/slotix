@@ -47,6 +47,7 @@ import { appKeysSchema as umami_zod_ts } from "./umami/zod";
 import { appKeysSchema as vital_zod_ts } from "./vital/zod";
 import { appKeysSchema as webex_zod_ts } from "./webex/zod";
 import { appKeysSchema as wordpress_zod_ts } from "./wordpress/zod";
+import { appKeysSchema as yandextelemost_zod_ts } from "./yandextelemost/zod";
 import { appKeysSchema as zapier_zod_ts } from "./zapier/zod";
 import { appKeysSchema as zoho_bigin_zod_ts } from "./zoho-bigin/zod";
 import { appKeysSchema as zohocalendar_zod_ts } from "./zohocalendar/zod";
@@ -98,6 +99,7 @@ export const appKeysSchemas = {
   vital: vital_zod_ts,
   webex: webex_zod_ts,
   wordpress: wordpress_zod_ts,
+  yandextelemost: yandextelemost_zod_ts,
   zapier: zapier_zod_ts,
   "zoho-bigin": zoho_bigin_zod_ts,
   zohocalendar: zohocalendar_zod_ts,

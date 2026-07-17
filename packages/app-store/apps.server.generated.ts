@@ -82,6 +82,7 @@ export const apiHandlers = {
   whatsapp: import("./whatsapp/api"),
   whereby: import("./whereby/api"),
   wipemycalother: import("./wipemycalother/api"),
+  yandextelemost: import("./yandextelemost/api"),
   zapier: import("./zapier/api"),
   "zoho-bigin": import("./zoho-bigin/api"),
   zohocalendar: import("./zohocalendar/api"),

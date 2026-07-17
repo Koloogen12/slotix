@@ -17,5 +17,6 @@ export const VideoApiAdapterMap =
         sylapsvideo: import("./sylapsvideo/lib/VideoApiAdapter"),
         tandemvideo: import("./tandemvideo/lib/VideoApiAdapter"),
         webex: import("./webex/lib/VideoApiAdapter"),
+        yandextelemost: import("./yandextelemost/lib/VideoApiAdapter"),
         zoomvideo: import("./zoomvideo/lib/VideoApiAdapter"),
       };

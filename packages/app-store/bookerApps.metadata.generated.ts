@@ -46,6 +46,7 @@ import umami_config_json from "./umami/config.json";
 import webex_config_json from "./webex/config.json";
 import whatsapp_config_json from "./whatsapp/config.json";
 import whereby_config_json from "./whereby/config.json";
+import { metadata as yandextelemost__metadata_ts } from "./yandextelemost/_metadata";
 import { metadata as zoomvideo__metadata_ts } from "./zoomvideo/_metadata";
 export const appStoreMetadata = {
   campfire: campfire_config_json,
@@ -92,5 +93,6 @@ export const appStoreMetadata = {
   webex: webex_config_json,
   whatsapp: whatsapp_config_json,
   whereby: whereby_config_json,
+  yandextelemost: yandextelemost__metadata_ts,
   zoomvideo: zoomvideo__metadata_ts,
 };
