@@ -1,22 +1,19 @@
-# Slotix production stack — slotix.neurin.tech
-# Deploy on a RU-hosted server (Selectel) per 152-ФЗ (personal data stays in RF).
+# Slotix — host-nginx variant (NO Caddy). App binds 127.0.0.1:8100; host nginx does TLS.
+# Postgres + Redis are in-stack on the internal 'slotix' network only (not published).
 #
-# Usage:
-#   cp .env.production.example .env.production   # then fill secrets
-#   docker compose -f docker-compose.prod.yml --env-file .env.production up -d --build
+# Used on the actual production box (Selectel mml-prod-1, a shared host running ~10 other
+# apps behind one host-level nginx). docker-compose.prod.yml (Caddy on 80/443) is NOT used
+# there — Caddy would fight the host nginx for those ports and could take down neighbors.
 #
-# Caddy terminates TLS (auto Let's Encrypt) and proxies to the Next.js app.
-
+# Compose resolves ${VAR} build-args below from a `.env` file in this same directory
+# (symlinked on the server to /etc/slotix/secrets.env) — separate from each service's
+# `env_file:`, which only injects runtime env into the running container.
 volumes:
   slotix-db-data:
   slotix-redis-data:
-  caddy-data:
-  caddy-config:
-
 networks:
   slotix:
     name: slotix
-
 services:
   database:
     image: postgres:17-alpine
@@ -27,23 +24,18 @@ services:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_DB: ${POSTGRES_DB}
-    networks:
-      - slotix
+    networks: [slotix]
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
       interval: 10s
       timeout: 5s
       retries: 6
-
   redis:
     image: redis:7-alpine
     restart: always
     volumes:
       - slotix-redis-data:/data
-    networks:
-      - slotix
-
-  # Runs Prisma migrations once on each deploy, then exits.
+    networks: [slotix]
   migrate:
     build:
       context: ../..
@@ -57,14 +49,12 @@ services:
         NEXT_PUBLIC_COMPANY_NAME: ${NEXT_PUBLIC_COMPANY_NAME}
         CALCOM_TELEMETRY_DISABLED: "1"
     command: ["yarn", "workspace", "@calcom/prisma", "db-deploy"]
-    env_file: .env.production
-    networks:
-      - slotix
+    env_file: /etc/slotix/secrets.env
+    networks: [slotix]
     depends_on:
       database:
         condition: service_healthy
     restart: "no"
-
   app:
     build:
       context: ../..
@@ -78,28 +68,12 @@ services:
         NEXT_PUBLIC_COMPANY_NAME: ${NEXT_PUBLIC_COMPANY_NAME}
         CALCOM_TELEMETRY_DISABLED: "1"
     restart: always
-    env_file: .env.production
-    networks:
-      - slotix
+    env_file: /etc/slotix/secrets.env
+    networks: [slotix]
     depends_on:
       database:
         condition: service_healthy
       migrate:
         condition: service_completed_successfully
-    expose:
-      - "3000"
-
-  caddy:
-    image: caddy:2-alpine
-    restart: always
     ports:
-      - "80:80"
-      - "443:443"
-    volumes:
-      - ./Caddyfile:/etc/caddy/Caddyfile:ro
-      - caddy-data:/data
-      - caddy-config:/config
-    networks:
-      - slotix
-    depends_on:
-      - app
+      - "127.0.0.1:8100:3000"
