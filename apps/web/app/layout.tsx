@@ -88,7 +88,7 @@ const getInitialProps = async () => {
   const h = await headers();
   const isEmbed = h.get("x-isEmbed") === "true";
   const embedColorScheme = h.get("x-embedColorScheme");
-  const newLocale = (await getLocale(buildLegacyRequest(await headers(), await cookies()))) ?? "en";
+  const newLocale = (await getLocale(buildLegacyRequest(await headers(), await cookies()))) ?? "ru";
   const direction = dir(newLocale) ?? "ltr";
 
   return {
