@@ -877,8 +877,15 @@ export const getOptions = ({
         // Azure AD never sets email_verified in the token profile, so isEmailVerified is always
         // falsy for AZUREAD logins. Use isAzureEmailDomainVerified (xms_edov) as the equivalent
         // proof of ownership so the auto-merge path treats Azure AD the same as other verified IdPs.
+        //
+        // Yandex's OAuth profile has no email_verified equivalent at all (next-auth's built-in
+        // Yandex provider only ever returns {id, name, email, image} — see
+        // node_modules/next-auth/providers/yandex.js). A Yandex account can't exist without a
+        // verified phone/email at signup, so treat every Yandex login as verified, same as Azure.
         const isVerified =
-          isEmailVerified || (idP === IdentityProvider.AZUREAD && isAzureEmailDomainVerified);
+          isEmailVerified ||
+          (idP === IdentityProvider.AZUREAD && isAzureEmailDomainVerified) ||
+          idP === IdentityProvider.YANDEX;
 
         if (idP === IdentityProvider.AZUREAD && !isAzureEmailDomainVerified) {
           log.error(
@@ -888,7 +895,7 @@ export const getOptions = ({
           return "/auth/error?error=unverified-email";
         }
 
-        if (!isEmailVerified && idP !== IdentityProvider.AZUREAD) {
+        if (!isEmailVerified && idP !== IdentityProvider.AZUREAD && idP !== IdentityProvider.YANDEX) {
           log.error("Attention: SAML/Google User email is not verified in the IdP", safeStringify({ user }));
           return "/auth/error?error=unverified-email";
         }
