@@ -57,11 +57,6 @@ const getTabs = (
           trackingMetadata: { section: "my_account", page: "calendars" },
         },
         {
-          name: "conferencing",
-          href: "/settings/my-account/conferencing",
-          trackingMetadata: { section: "my_account", page: "conferencing" },
-        },
-        {
           name: "appearance",
           href: "/settings/my-account/appearance",
           trackingMetadata: { section: "my_account", page: "appearance" },
@@ -95,36 +90,6 @@ const getTabs = (
           href: "/settings/security/two-factor-auth",
           trackingMetadata: { section: "security", page: "2fa_auth" },
         },
-      ],
-    },
-    {
-      name: "developer",
-      href: "/settings/developer",
-      icon: "terminal",
-      children: [
-        //
-        {
-          name: "webhooks",
-          href: "/settings/developer/webhooks",
-          trackingMetadata: { section: "developer", page: "webhooks" },
-        },
-        {
-          name: "oAuth",
-          href: "/settings/developer/oauth",
-          trackingMetadata: { section: "developer", page: "oauth_clients" },
-        },
-        {
-          name: "api_keys",
-          href: "/settings/developer/api-keys",
-          trackingMetadata: { section: "developer", page: "api_keys" },
-        },
-        {
-          name: "api_docs",
-          href: "/docs",
-          trackingMetadata: { section: "developer", page: "api_docs" },
-        },
-        // TODO: Add profile level for embeds
-        // { name: "embeds", href: "/v2/settings/developer/embeds" },
       ],
     },
     {
