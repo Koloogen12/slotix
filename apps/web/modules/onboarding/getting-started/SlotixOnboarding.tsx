@@ -47,7 +47,8 @@ function evaluateSlug(raw: string, available: boolean | null): SlugState {
   const s = raw.trim().toLowerCase();
   if (!s) return { message: "Придумайте адрес — латиницей", color: "#8E97A4", ok: false };
   if (s.length < 3) return { message: "Минимум 3 символа", color: "#8E97A4", ok: false };
-  if (available === false) return { message: `✗ Занят — попробуйте ${s}1 или ${s}.pro`, color: "#D64545", ok: false };
+  if (available === false)
+    return { message: `✗ Занят — попробуйте ${s}1 или ${s}.pro`, color: "#D64545", ok: false };
   if (available === true) return { message: "✓ Адрес свободен", color: "#2E8A73", ok: true };
   return { message: "Проверяем…", color: "#8E97A4", ok: false };
 }
@@ -105,8 +106,7 @@ export default function SlotixOnboarding() {
   );
 
   const connectGoogle = useAddAppMutation("google_calendar", {
-    onError: (e) =>
-      showToast(e instanceof Error ? e.message : "Не удалось подключить Google", "error"),
+    onError: (e) => showToast(e instanceof Error ? e.message : "Не удалось подключить Google", "error"),
   });
 
   const updateProfile = trpc.viewer.me.updateProfile.useMutation({
@@ -145,29 +145,70 @@ export default function SlotixOnboarding() {
         fontFamily: "'Golos Text', system-ui, sans-serif",
       }}>
       <div style={{ width: 600, maxWidth: "100%" }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 11, justifyContent: "center", marginBottom: 14 }}>
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 11,
+            justifyContent: "center",
+            marginBottom: 14,
+          }}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src="/slotix/slotix-icon.png" alt="" style={{ width: 34, height: 34, borderRadius: 9 }} />
-          <div style={{ font: "700 20px 'Golos Text'", color: "#1A1C1E", letterSpacing: ".02em" }}>SLOTIX</div>
+          <div style={{ font: "700 20px 'Golos Text'", color: "#1A1C1E", letterSpacing: ".02em" }}>
+            SLOTIX
+          </div>
         </div>
-        <h1 style={{ textAlign: "center", font: "700 28px 'Golos Text'", color: "#1A1C1E", margin: "0 0 6px" }}>
+        <h1
+          style={{ textAlign: "center", font: "700 28px 'Golos Text'", color: "#1A1C1E", margin: "0 0 6px" }}>
           Добро пожаловать!
         </h1>
-        <p style={{ textAlign: "center", font: "400 15px 'Golos Text'", color: "#8E97A4", margin: "0 0 30px" }}>
+        <p
+          style={{
+            textAlign: "center",
+            font: "400 15px 'Golos Text'",
+            color: "#8E97A4",
+            margin: "0 0 30px",
+          }}>
           Два шага — и вашу ссылку можно отправлять клиентам
         </p>
 
         {/* Step 1 — profile + slug */}
         <div style={glassCard}>
           <div style={{ display: "flex", alignItems: "center", gap: 13, marginBottom: 22 }}>
-            <div style={{ width: 32, height: 32, borderRadius: "50%", background: "linear-gradient(135deg,#66A6FF,#5094F0)", color: "#fff", font: "700 14px 'Golos Text'", display: "flex", alignItems: "center", justifyContent: "center" }}>
+            <div
+              style={{
+                width: 32,
+                height: 32,
+                borderRadius: "50%",
+                background: "linear-gradient(135deg,#66A6FF,#5094F0)",
+                color: "#fff",
+                font: "700 14px 'Golos Text'",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}>
               1
             </div>
-            <div style={{ font: "700 16px 'Golos Text'", color: "#1A1C1E" }}>Расскажите о себе и выберите адрес</div>
+            <div style={{ font: "700 16px 'Golos Text'", color: "#1A1C1E" }}>
+              Расскажите о себе и выберите адрес
+            </div>
           </div>
 
           <div style={{ display: "flex", alignItems: "center", gap: 16, marginBottom: 18 }}>
-            <div style={{ width: 60, height: 60, borderRadius: "50%", boxShadow: "0 0 0 1.5px #5094F0", overflow: "hidden", flex: "none", background: "rgba(255,255,255,.85)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+            <div
+              style={{
+                width: 60,
+                height: 60,
+                borderRadius: "50%",
+                boxShadow: "0 0 0 1.5px #5094F0",
+                overflow: "hidden",
+                flex: "none",
+                background: "rgba(255,255,255,.85)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}>
               {avatar ? (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img src={avatar} alt="" style={{ width: 60, height: 60, objectFit: "cover" }} />
@@ -192,27 +233,62 @@ export default function SlotixOnboarding() {
           <div style={{ display: "grid", gap: 16 }}>
             <div>
               <label style={labelStyle}>Имя</label>
-              <input style={inputStyle} value={name} onChange={(e) => setName(e.target.value)} placeholder="Алексей Ковалёв" />
+              <input
+                style={inputStyle}
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="Алексей Ковалёв"
+              />
             </div>
             <div>
               <label style={labelStyle}>Короткое описание</label>
-              <input style={inputStyle} value={bio} onChange={(e) => setBio(e.target.value)} placeholder="Например: продуктовый эксперт" />
+              <input
+                style={inputStyle}
+                value={bio}
+                onChange={(e) => setBio(e.target.value)}
+                placeholder="Например: продуктовый эксперт"
+              />
             </div>
             <div>
               <label style={labelStyle}>Адрес страницы</label>
-              <div style={{ display: "flex", alignItems: "center", border: "1px solid #D1D9E6", borderRadius: 12, background: "rgba(255,255,255,.75)", overflow: "hidden" }}>
-                <span style={{ padding: "12px 4px 12px 14px", font: "400 15px 'Golos Text'", color: "#8E97A4" }}>slotix.ru/</span>
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  border: "1px solid #D1D9E6",
+                  borderRadius: 12,
+                  background: "rgba(255,255,255,.75)",
+                  overflow: "hidden",
+                }}>
+                <span
+                  style={{ padding: "12px 4px 12px 14px", font: "400 15px 'Golos Text'", color: "#8E97A4" }}>
+                  slotix.ru/
+                </span>
                 <input
                   value={username}
                   onChange={(e) => setUsername(e.target.value.replace(/[^a-z0-9.-]/gi, "").toLowerCase())}
-                  style={{ flex: 1, border: "none", background: "transparent", padding: "12px 14px 12px 0", font: "600 15px 'Golos Text'", color: "#1A1C1E", outline: "none" }}
+                  style={{
+                    flex: 1,
+                    border: "none",
+                    background: "transparent",
+                    padding: "12px 14px 12px 0",
+                    font: "600 15px 'Golos Text'",
+                    color: "#1A1C1E",
+                    outline: "none",
+                  }}
                 />
               </div>
-              <div style={{ marginTop: 8, font: "500 12.5px 'Golos Text'", color: slug.color }}>{slug.message}</div>
+              <div style={{ marginTop: 8, font: "500 12.5px 'Golos Text'", color: slug.color }}>
+                {slug.message}
+              </div>
             </div>
             <div>
               <label style={labelStyle}>Часовой пояс</label>
-              <TimezoneSelect value={timezone} onChange={({ value }) => setTimezone(value)} className="w-full rounded-md text-sm" />
+              <TimezoneSelect
+                value={timezone}
+                onChange={({ value }) => setTimezone(value)}
+                className="w-full rounded-md text-sm"
+              />
             </div>
           </div>
         </div>
@@ -220,9 +296,32 @@ export default function SlotixOnboarding() {
         {/* Step 2 — Google */}
         <div style={{ ...glassCard, marginBottom: 24 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 13, marginBottom: 18 }}>
-            <div style={{ width: 32, height: 32, borderRadius: "50%", font: "700 14px 'Golos Text'", display: "flex", alignItems: "center", justifyContent: "center", flex: "none", ...(googleConnected ? { background: "linear-gradient(135deg,#4FD6A0,#3FCB6E)", color: "#fff" } : { background: "rgba(80,148,240,.14)", color: "#2F6FD0" }) }}>
+            <div
+              style={{
+                width: 32,
+                height: 32,
+                borderRadius: "50%",
+                font: "700 14px 'Golos Text'",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                flex: "none",
+                ...(googleConnected
+                  ? { background: "linear-gradient(135deg,#4FD6A0,#3FCB6E)", color: "#fff" }
+                  : { background: "rgba(80,148,240,.14)", color: "#2F6FD0" }),
+              }}>
               {googleConnected ? (
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M20 6L9 17l-5-5" /></svg>
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="#fff"
+                  strokeWidth="3"
+                  strokeLinecap="round"
+                  strokeLinejoin="round">
+                  <path d="M20 6L9 17l-5-5" />
+                </svg>
               ) : (
                 "2"
               )}
@@ -230,9 +329,28 @@ export default function SlotixOnboarding() {
             <div style={{ font: "700 16px 'Golos Text'", color: "#1A1C1E" }}>Подключите аккаунт Google</div>
           </div>
           {googleConnected ? (
-            <div style={{ display: "flex", alignItems: "center", gap: 12, padding: "14px 16px", borderRadius: 12, background: "rgba(63,162,148,.1)", border: "1px solid rgba(63,162,148,.22)" }}>
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 12,
+                padding: "14px 16px",
+                borderRadius: 12,
+                background: "rgba(63,162,148,.1)",
+                border: "1px solid rgba(63,162,148,.22)",
+              }}>
               <span style={{ color: "#2E8A73" }}>
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M20 6L9 17l-5-5" /></svg>
+                <svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round">
+                  <path d="M20 6L9 17l-5-5" />
+                </svg>
               </span>
               <div style={{ font: "600 14px 'Golos Text'", color: "#1A1C1E" }}>Google подключён</div>
             </div>
@@ -245,9 +363,36 @@ export default function SlotixOnboarding() {
                 type="button"
                 onClick={() => connectGoogle.mutate("")}
                 disabled={connectGoogle.isPending}
-                style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 11, width: "100%", padding: 13, border: "1px solid #D1D9E6", borderRadius: 12, background: "#fff", color: "#1A1C1E", font: "600 14px 'Golos Text'", cursor: "pointer" }}>
-                <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.5 12.2c0-.7-.1-1.4-.2-2H12v3.8h5.9a5 5 0 0 1-2.2 3.3v2.7h3.6c2.1-2 3.2-4.8 3.2-7.8z" /><path fill="#34A853" d="M12 23c2.9 0 5.4-1 7.2-2.6l-3.6-2.7c-1 .7-2.3 1-3.6 1-2.8 0-5.1-1.9-6-4.4H2.3v2.8A11 11 0 0 0 12 23z" /><path fill="#FBBC05" d="M6 14.3a6.6 6.6 0 0 1 0-4.2V7.3H2.3a11 11 0 0 0 0 9.8L6 14.3z" /><path fill="#EA4335" d="M12 5.4c1.6 0 3 .5 4.1 1.6l3.1-3.1A11 11 0 0 0 12 1a11 11 0 0 0-9.7 6l3.7 2.8c.9-2.5 3.2-4.4 6-4.4z" /></svg>
-                Войти с помощью Google
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: 11,
+                  width: "100%",
+                  padding: 13,
+                  border: "1px solid #D1D9E6",
+                  borderRadius: 12,
+                  background: "#fff",
+                  color: "#1A1C1E",
+                  font: "600 14px 'Golos Text'",
+                  cursor: "pointer",
+                }}>
+                <svg width="18" height="18" viewBox="0 0 24 24">
+                  <path
+                    fill="#4285F4"
+                    d="M22.5 12.2c0-.7-.1-1.4-.2-2H12v3.8h5.9a5 5 0 0 1-2.2 3.3v2.7h3.6c2.1-2 3.2-4.8 3.2-7.8z"
+                  />
+                  <path
+                    fill="#34A853"
+                    d="M12 23c2.9 0 5.4-1 7.2-2.6l-3.6-2.7c-1 .7-2.3 1-3.6 1-2.8 0-5.1-1.9-6-4.4H2.3v2.8A11 11 0 0 0 12 23z"
+                  />
+                  <path fill="#FBBC05" d="M6 14.3a6.6 6.6 0 0 1 0-4.2V7.3H2.3a11 11 0 0 0 0 9.8L6 14.3z" />
+                  <path
+                    fill="#EA4335"
+                    d="M12 5.4c1.6 0 3 .5 4.1 1.6l3.1-3.1A11 11 0 0 0 12 1a11 11 0 0 0-9.7 6l3.7 2.8c.9-2.5 3.2-4.4 6-4.4z"
+                  />
+                </svg>
+                Подключить Google Calendar
               </button>
             </div>
           )}
@@ -257,7 +402,22 @@ export default function SlotixOnboarding() {
           type="button"
           onClick={save}
           disabled={!ctaEnabled}
-          style={{ width: "100%", padding: 16, border: "none", borderRadius: 13, font: "600 15px 'Golos Text'", transition: "all .2s", ...(ctaEnabled ? { background: "linear-gradient(135deg,#66A6FF,#5094F0)", color: "#fff", cursor: "pointer", boxShadow: "0 10px 24px rgba(80,148,240,.35)" } : { background: "#DCE4EC", color: "#A9B4BF", cursor: "not-allowed" }) }}>
+          style={{
+            width: "100%",
+            padding: 16,
+            border: "none",
+            borderRadius: 13,
+            font: "600 15px 'Golos Text'",
+            transition: "all .2s",
+            ...(ctaEnabled
+              ? {
+                  background: "linear-gradient(135deg,#66A6FF,#5094F0)",
+                  color: "#fff",
+                  cursor: "pointer",
+                  boxShadow: "0 10px 24px rgba(80,148,240,.35)",
+                }
+              : { background: "#DCE4EC", color: "#A9B4BF", cursor: "not-allowed" }),
+          }}>
           {updateProfile.isPending ? "Сохраняем…" : "Сохранить и продолжить"}
         </button>
       </div>
