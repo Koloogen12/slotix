@@ -1,6 +1,5 @@
-import process from "node:process";
 import * as Sentry from "@sentry/nextjs";
-import type { Instrumentation } from "next";
+import { type Instrumentation } from "next";
 
 export async function register() {
   if (process.env.NEXT_RUNTIME === "nodejs") {
@@ -12,8 +11,7 @@ export async function register() {
     // Telegram webhook handler blow past Telegram's own delivery timeout ("Connection timed
     // out") even though our handler code was fine. Prefer IPv4 results for all outbound DNS
     // lookups process-wide so this class of bug can't recur for any other integration.
-    const dns = await import("node:dns");
-    dns.setDefaultResultOrder("ipv4first");
+    await import("./dns-ipv4-first");
   }
 
   if (process.env.NODE_ENV === "production") {
