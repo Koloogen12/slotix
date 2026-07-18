@@ -1,6 +1,7 @@
 import { getDefaultLocations } from "@calcom/app-store/_utils/getDefaultLocations";
 import { DailyLocationType } from "@calcom/app-store/constants";
 import { EventTypeRepository } from "@calcom/features/eventtypes/repositories/eventTypeRepository";
+import slugify from "@calcom/lib/slugify";
 import type { PrismaClient } from "@calcom/prisma";
 import { Prisma } from "@calcom/prisma/client";
 import { MembershipRole, SchedulingType } from "@calcom/prisma/enums";
@@ -12,9 +13,15 @@ import type { TCreateInputSchema } from "./create.schema";
 
 class PermissionCheckService {
   constructor(_prisma?: unknown) {}
-  async checkPermission(..._args: unknown[]) { return true; }
-  async hasPermission(..._args: unknown[]) { return true; }
-  async getTeamIdsWithPermission(..._args: unknown[]): Promise<number[]> { return []; }
+  async checkPermission(..._args: unknown[]) {
+    return true;
+  }
+  async hasPermission(..._args: unknown[]) {
+    return true;
+  }
+  async getTeamIdsWithPermission(..._args: unknown[]): Promise<number[]> {
+    return [];
+  }
 }
 
 type EventTypeLocation = z.infer<typeof eventTypeLocations>[number];
@@ -50,6 +57,7 @@ export const createHandler = async ({ ctx, input }: CreateOptions) => {
     locations: inputLocations,
     scheduleId,
     calVideoSettings,
+    slug,
     ...rest
   } = input;
 
@@ -77,6 +85,10 @@ export const createHandler = async ({ ctx, input }: CreateOptions) => {
 
   const data: Prisma.EventTypeCreateInput = {
     ...rest,
+    // Sanitize server-side too, not just in the form's onChange handler — a stale client
+    // bundle or a direct API call would otherwise persist a raw (e.g. Cyrillic) slug that
+    // 404s on the booking page's dynamic route.
+    slug: slugify(slug),
     owner: teamId ? undefined : { connect: { id: userId } },
     metadata: (metadata as Prisma.InputJsonObject) ?? undefined,
     // Only connecting the current user for non-managed event types and non team event types

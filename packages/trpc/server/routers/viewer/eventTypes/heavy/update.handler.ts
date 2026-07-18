@@ -10,6 +10,7 @@ import tasker from "@calcom/features/tasker";
 import { getTranslation } from "@calcom/i18n/server";
 import { validateIntervalLimitOrder } from "@calcom/lib/intervalLimits/validateIntervalLimitOrder";
 import logger from "@calcom/lib/logger";
+import slugify from "@calcom/lib/slugify";
 import { validateBookerLayouts } from "@calcom/lib/validateBookerLayouts";
 import type { PrismaClient } from "@calcom/prisma";
 import { Prisma } from "@calcom/prisma/client";
@@ -211,6 +212,10 @@ export const updateHandler = async ({ ctx, input }: UpdateOptions) => {
 
   const data: Prisma.EventTypeUpdateInput = {
     ...rest,
+    // Sanitize server-side too, not just in the form's onChange handler — a stale client
+    // bundle or a direct API call would otherwise persist a raw (e.g. Cyrillic) slug that
+    // 404s on the booking page's dynamic route.
+    ...(rest.slug !== undefined && { slug: slugify(rest.slug as string) }),
     // Only update autoTranslateInstantMeetingTitleEnabled when explicitly provided to avoid overwriting saved opt-out
     ...(autoTranslateInstantMeetingTitleEnabled !== undefined && { autoTranslateInstantMeetingTitleEnabled }),
     // Only set if explicitly provided to avoid overwriting existing value with false

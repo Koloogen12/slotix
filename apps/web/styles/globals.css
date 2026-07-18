@@ -18,15 +18,6 @@ body {
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   background-color: var(--background);
-  background-image: url("/slotix/aurora-bg.png");
-  background-position: center;
-  background-size: cover;
-  background-repeat: no-repeat;
-  background-attachment: fixed;
-}
-
-html.dark body {
-  background-image: none;
 }
 
 /*

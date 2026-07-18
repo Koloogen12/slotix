@@ -40,67 +40,24 @@ const MicrosoftIcon = () => <img className="size-4" src="/microsoft-logo.svg" al
 
 const GoogleIcon = () => <img className="size-4" src="/google-icon-colored.svg" alt="" />;
 
-function BackgroundGrid() {
-  const rows = 9;
-  const cols = 18;
-  const size = 60;
-  const gap = 8;
-  const radius = 8;
-  const width = cols * size + (cols - 1) * gap;
-  const height = rows * size + (rows - 1) * gap;
+// Matches the Yandex ID mark used in the landing page's login modal (LandingView.tsx)
+// so the fallback page and the modal read as the same button.
+const YandexIcon = () => (
+  <svg className="size-4" viewBox="0 0 24 24" aria-hidden>
+    <circle cx="12" cy="12" r="12" fill="#FC3F1D" />
+    <path
+      fill="#fff"
+      d="M13.3 6.4h-1.5c-1.9 0-3.3 1.2-3.3 3 0 1.4.7 2.2 2 3.1L8 17.6h1.8l2-3.6h.9v3.6h1.6V6.4h-1zm-1 6.2h-.5c-1 0-1.7-.5-1.7-1.8 0-1.3.8-1.8 1.7-1.8h.5v3.6z"
+    />
+  </svg>
+);
 
-  return (
-    <div className="pointer-events-none absolute inset-0 flex items-center justify-center overflow-hidden">
-      <svg
-        width={width}
-        height={height}
-        viewBox={`0 0 ${width} ${height}`}
-        fill="none"
-        className="[--grid-fill:#f7f7f7] [--grid-stroke:rgba(34,42,53,0.08)] dark:[--grid-fill:#1f1f1f] dark:[--grid-stroke:rgba(255,255,255,0.08)]">
-        <defs>
-          <radialGradient id="gridFade" cx="50%" cy="50%" rx="70%" ry="70%">
-            <stop offset="20%" stopColor="white" stopOpacity="1" />
-            <stop offset="100%" stopColor="white" stopOpacity="0" />
-          </radialGradient>
-          <mask id="gridMask">
-            <rect width={width} height={height} fill="url(#gridFade)" />
-          </mask>
-          <filter id="gridShadow" x="-20%" y="-20%" width="140%" height="140%">
-            <feDropShadow dx="0" dy="4" stdDeviation="4" floodColor="rgba(34,42,53,0.05)" />
-            <feDropShadow dx="0" dy="1" stdDeviation="2" floodColor="rgba(19,19,22,0.03)" />
-          </filter>
-        </defs>
-        <g mask="url(#gridMask)">
-          {Array.from({ length: rows * cols }).map((_, i) => {
-            const col = i % cols;
-            const row = Math.floor(i / cols);
-            const x = col * (size + gap);
-            const y = row * (size + gap);
-            return (
-              <rect
-                key={i}
-                x={x}
-                y={y}
-                width={size}
-                height={size}
-                rx={radius}
-                fill="var(--grid-fill)"
-                stroke="var(--grid-stroke)"
-                strokeWidth="1"
-                filter="url(#gridShadow)"
-              />
-            );
-          })}
-        </g>
-      </svg>
-    </div>
-  );
-}
 export type PageProps = inferSSRProps<typeof getServerSideProps>;
 export default function Login({
   csrfToken,
   isGoogleLoginEnabled,
   isOutlookLoginEnabled,
+  isYandexLoginEnabled,
   totpEmail,
 }: PageProps) {
   const searchParams = useCompatSearchParams();
@@ -166,17 +123,20 @@ export default function Login({
     else setErrorMessage(errorMessages[res.error] || t("something_went_wrong"));
   };
 
-  const showSocialLogin = isGoogleLoginEnabled || isOutlookLoginEnabled;
+  const showSocialLogin = isGoogleLoginEnabled || isOutlookLoginEnabled || isYandexLoginEnabled;
   const showSignupLink =
     process.env.NEXT_PUBLIC_DISABLE_SIGNUP !== "true" && searchParams?.get("register") !== "false";
 
   return (
-    <div className="relative flex min-h-screen items-center justify-center bg-default/80 px-4 py-10">
-      <BackgroundGrid />
-
-      <div className="relative z-10 flex w-full max-w-md flex-col items-center">
-        {/* Main Card */}
-        <div className="w-full rounded-xl border border-subtle bg-default p-10 shadow-sm">
+    // Same aurora background as the landing/signup/onboarding pages (each sets it inline
+    // rather than relying on a global body rule, since the aurora shouldn't bleed into the
+    // authenticated dashboard/settings pages).
+    <div
+      className="flex min-h-screen items-center justify-center px-4 py-10"
+      style={{ background: "#eaf2fb url(/slotix/aurora-bg.png) center / cover no-repeat fixed" }}>
+      <div className="flex w-full max-w-md flex-col items-center">
+        {/* Main Card — bg-default + border-subtle is turned into a glass surface globally, see packages/coss-ui/src/styles/globals.css */}
+        <div className="w-full rounded-2xl border border-subtle bg-default p-10">
           {/* Logo */}
           <div className="mb-2 text-center">
             <h1 className="font-cal text-xl font-bold text-emphasis">{APP_NAME}</h1>
@@ -194,6 +154,7 @@ export default function Login({
                 <div className="flex flex-col gap-2">
                   {isGoogleLoginEnabled && (
                     <Button
+                      variant="outline"
                       className="w-full py-1"
                       disabled={formState.isSubmitting}
                       data-testid="google"
@@ -207,6 +168,24 @@ export default function Login({
                       <GoogleIcon />
                       <span>{t("signin_with_google")}</span>
                       {lastUsed === "google" && <LastUsed />}
+                    </Button>
+                  )}
+                  {isYandexLoginEnabled && (
+                    <Button
+                      variant="outline"
+                      className="w-full py-1"
+                      disabled={formState.isSubmitting}
+                      data-testid="yandex"
+                      onClick={async (e) => {
+                        e.preventDefault();
+                        setLastUsed("yandex");
+                        await signIn("yandex", {
+                          callbackUrl,
+                        });
+                      }}>
+                      <YandexIcon />
+                      <span>{t("signin_with_yandex")}</span>
+                      {lastUsed === "yandex" && <LastUsed />}
                     </Button>
                   )}
                   {isOutlookLoginEnabled && (
