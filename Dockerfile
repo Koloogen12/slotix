@@ -94,6 +94,14 @@ ENV NEXT_PUBLIC_WEBAPP_URL=$NEXT_PUBLIC_WEBAPP_URL \
   BUILT_NEXT_PUBLIC_WEBAPP_URL=$NEXT_PUBLIC_WEBAPP_URL
 
 ENV NODE_ENV=production
+# Container's Docker network has IPv6 disabled entirely, but some third-party APIs we call
+# (e.g. Telegram's api.telegram.org) resolve DNS to an IPv6-only-first address here — Node's
+# default "verbatim" order then hangs on the unreachable IPv6 route until connect-timeout before
+# giving up, which blew past Telegram's own webhook delivery timeout. --dns-result-order is a
+# genuine Node CLI flag (verified NODE_OPTIONS-compatible on Node 20) applied at process start,
+# so unlike a Next.js instrumentation.ts hook it isn't affected by standalone-output dependency
+# tracing (which silently drops dynamically-imported local, non-package files).
+ENV NODE_OPTIONS=--dns-result-order=ipv4first
 EXPOSE 3000
 
 HEALTHCHECK --interval=30s --timeout=30s --retries=5 \
