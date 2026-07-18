@@ -1470,10 +1470,10 @@ export default function LandingView() {
               <a href="#" className="sx-a">
                 Справочный центр
               </a>
-              <a href="#" className="sx-a">
+              <a href="/privacy" className="sx-a">
                 Политика конфиденциальности
               </a>
-              <a href="#" className="sx-a">
+              <a href="/oferta" className="sx-a">
                 Условия использования
               </a>
             </div>
@@ -1577,71 +1577,74 @@ export default function LandingView() {
                   Войдите, чтобы управлять расписанием
                 </p>
                 {hasProvider("google") && (
-                <button
-                  type="button"
-                  onClick={loginWithGoogle}
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    gap: 11,
-                    width: "100%",
-                    boxSizing: "border-box",
-                    padding: 13,
-                    border: "1px solid #D6DEE9",
-                    borderRadius: 13,
-                    background: "#fff",
-                    color: "#1A1C1E",
-                    font: "600 14.5px 'Golos Text'",
-                    cursor: "pointer",
-                  }}>
-                  <svg width="18" height="18" viewBox="0 0 24 24">
-                    <path
-                      fill="#4285F4"
-                      d="M22.5 12.2c0-.7-.1-1.4-.2-2H12v3.8h5.9a5 5 0 0 1-2.2 3.3v2.7h3.6c2.1-2 3.2-4.8 3.2-7.8z"
-                    />
-                    <path
-                      fill="#34A853"
-                      d="M12 23c2.9 0 5.4-1 7.2-2.6l-3.6-2.7c-1 .7-2.3 1-3.6 1-2.8 0-5.1-1.9-6-4.4H2.3v2.8A11 11 0 0 0 12 23z"
-                    />
-                    <path fill="#FBBC05" d="M6 14.3a6.6 6.6 0 0 1 0-4.2V7.3H2.3a11 11 0 0 0 0 9.8L6 14.3z" />
-                    <path
-                      fill="#EA4335"
-                      d="M12 5.4c1.6 0 3 .5 4.1 1.6l3.1-3.1A11 11 0 0 0 12 1a11 11 0 0 0-9.7 6l3.7 2.8c.9-2.5 3.2-4.4 6-4.4z"
-                    />
-                  </svg>
-                  Войти с помощью Google
-                </button>
+                  <button
+                    type="button"
+                    onClick={loginWithGoogle}
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      gap: 11,
+                      width: "100%",
+                      boxSizing: "border-box",
+                      padding: 13,
+                      border: "1px solid #D6DEE9",
+                      borderRadius: 13,
+                      background: "#fff",
+                      color: "#1A1C1E",
+                      font: "600 14.5px 'Golos Text'",
+                      cursor: "pointer",
+                    }}>
+                    <svg width="18" height="18" viewBox="0 0 24 24">
+                      <path
+                        fill="#4285F4"
+                        d="M22.5 12.2c0-.7-.1-1.4-.2-2H12v3.8h5.9a5 5 0 0 1-2.2 3.3v2.7h3.6c2.1-2 3.2-4.8 3.2-7.8z"
+                      />
+                      <path
+                        fill="#34A853"
+                        d="M12 23c2.9 0 5.4-1 7.2-2.6l-3.6-2.7c-1 .7-2.3 1-3.6 1-2.8 0-5.1-1.9-6-4.4H2.3v2.8A11 11 0 0 0 12 23z"
+                      />
+                      <path
+                        fill="#FBBC05"
+                        d="M6 14.3a6.6 6.6 0 0 1 0-4.2V7.3H2.3a11 11 0 0 0 0 9.8L6 14.3z"
+                      />
+                      <path
+                        fill="#EA4335"
+                        d="M12 5.4c1.6 0 3 .5 4.1 1.6l3.1-3.1A11 11 0 0 0 12 1a11 11 0 0 0-9.7 6l3.7 2.8c.9-2.5 3.2-4.4 6-4.4z"
+                      />
+                    </svg>
+                    Войти с помощью Google
+                  </button>
                 )}
                 {hasProvider("yandex") && (
-                <button
-                  type="button"
-                  onClick={loginWithYandex}
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    gap: 11,
-                    width: "100%",
-                    boxSizing: "border-box",
-                    marginTop: 10,
-                    padding: 13,
-                    border: "1px solid #D6DEE9",
-                    borderRadius: 13,
-                    background: "#fff",
-                    color: "#1A1C1E",
-                    font: "600 14.5px 'Golos Text'",
-                    cursor: "pointer",
-                  }}>
-                  <svg width="18" height="18" viewBox="0 0 24 24">
-                    <circle cx="12" cy="12" r="12" fill="#FC3F1D" />
-                    <path
-                      fill="#fff"
-                      d="M13.3 6.4h-1.5c-1.9 0-3.3 1.2-3.3 3 0 1.4.7 2.2 2 3.1L8 17.6h1.8l2-3.6h.9v3.6h1.6V6.4h-1zm-1 6.2h-.5c-1 0-1.7-.5-1.7-1.8 0-1.3.8-1.8 1.7-1.8h.5v3.6z"
-                    />
-                  </svg>
-                  Войти с Yandex ID
-                </button>
+                  <button
+                    type="button"
+                    onClick={loginWithYandex}
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      gap: 11,
+                      width: "100%",
+                      boxSizing: "border-box",
+                      marginTop: 10,
+                      padding: 13,
+                      border: "1px solid #D6DEE9",
+                      borderRadius: 13,
+                      background: "#fff",
+                      color: "#1A1C1E",
+                      font: "600 14.5px 'Golos Text'",
+                      cursor: "pointer",
+                    }}>
+                    <svg width="18" height="18" viewBox="0 0 24 24">
+                      <circle cx="12" cy="12" r="12" fill="#FC3F1D" />
+                      <path
+                        fill="#fff"
+                        d="M13.3 6.4h-1.5c-1.9 0-3.3 1.2-3.3 3 0 1.4.7 2.2 2 3.1L8 17.6h1.8l2-3.6h.9v3.6h1.6V6.4h-1zm-1 6.2h-.5c-1 0-1.7-.5-1.7-1.8 0-1.3.8-1.8 1.7-1.8h.5v3.6z"
+                      />
+                    </svg>
+                    Войти с Yandex ID
+                  </button>
                 )}
                 <div style={{ display: "flex", alignItems: "center", gap: 14, margin: "20px 0" }}>
                   <span style={{ flex: 1, height: 1, background: "rgba(20,30,45,.1)" }} />
@@ -1807,71 +1810,74 @@ export default function LandingView() {
                   Регистрация за минуту — дальше настроим профиль
                 </p>
                 {hasProvider("google") && (
-                <button
-                  type="button"
-                  onClick={registerWithGoogle}
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    gap: 11,
-                    width: "100%",
-                    boxSizing: "border-box",
-                    padding: 13,
-                    border: "1px solid #D6DEE9",
-                    borderRadius: 13,
-                    background: "#fff",
-                    color: "#1A1C1E",
-                    font: "600 14.5px 'Golos Text'",
-                    cursor: "pointer",
-                  }}>
-                  <svg width="18" height="18" viewBox="0 0 24 24">
-                    <path
-                      fill="#4285F4"
-                      d="M22.5 12.2c0-.7-.1-1.4-.2-2H12v3.8h5.9a5 5 0 0 1-2.2 3.3v2.7h3.6c2.1-2 3.2-4.8 3.2-7.8z"
-                    />
-                    <path
-                      fill="#34A853"
-                      d="M12 23c2.9 0 5.4-1 7.2-2.6l-3.6-2.7c-1 .7-2.3 1-3.6 1-2.8 0-5.1-1.9-6-4.4H2.3v2.8A11 11 0 0 0 12 23z"
-                    />
-                    <path fill="#FBBC05" d="M6 14.3a6.6 6.6 0 0 1 0-4.2V7.3H2.3a11 11 0 0 0 0 9.8L6 14.3z" />
-                    <path
-                      fill="#EA4335"
-                      d="M12 5.4c1.6 0 3 .5 4.1 1.6l3.1-3.1A11 11 0 0 0 12 1a11 11 0 0 0-9.7 6l3.7 2.8c.9-2.5 3.2-4.4 6-4.4z"
-                    />
-                  </svg>
-                  Продолжить с Google
-                </button>
+                  <button
+                    type="button"
+                    onClick={registerWithGoogle}
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      gap: 11,
+                      width: "100%",
+                      boxSizing: "border-box",
+                      padding: 13,
+                      border: "1px solid #D6DEE9",
+                      borderRadius: 13,
+                      background: "#fff",
+                      color: "#1A1C1E",
+                      font: "600 14.5px 'Golos Text'",
+                      cursor: "pointer",
+                    }}>
+                    <svg width="18" height="18" viewBox="0 0 24 24">
+                      <path
+                        fill="#4285F4"
+                        d="M22.5 12.2c0-.7-.1-1.4-.2-2H12v3.8h5.9a5 5 0 0 1-2.2 3.3v2.7h3.6c2.1-2 3.2-4.8 3.2-7.8z"
+                      />
+                      <path
+                        fill="#34A853"
+                        d="M12 23c2.9 0 5.4-1 7.2-2.6l-3.6-2.7c-1 .7-2.3 1-3.6 1-2.8 0-5.1-1.9-6-4.4H2.3v2.8A11 11 0 0 0 12 23z"
+                      />
+                      <path
+                        fill="#FBBC05"
+                        d="M6 14.3a6.6 6.6 0 0 1 0-4.2V7.3H2.3a11 11 0 0 0 0 9.8L6 14.3z"
+                      />
+                      <path
+                        fill="#EA4335"
+                        d="M12 5.4c1.6 0 3 .5 4.1 1.6l3.1-3.1A11 11 0 0 0 12 1a11 11 0 0 0-9.7 6l3.7 2.8c.9-2.5 3.2-4.4 6-4.4z"
+                      />
+                    </svg>
+                    Продолжить с Google
+                  </button>
                 )}
                 {hasProvider("yandex") && (
-                <button
-                  type="button"
-                  onClick={registerWithYandex}
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    gap: 11,
-                    width: "100%",
-                    boxSizing: "border-box",
-                    marginTop: 10,
-                    padding: 13,
-                    border: "1px solid #D6DEE9",
-                    borderRadius: 13,
-                    background: "#fff",
-                    color: "#1A1C1E",
-                    font: "600 14.5px 'Golos Text'",
-                    cursor: "pointer",
-                  }}>
-                  <svg width="18" height="18" viewBox="0 0 24 24">
-                    <circle cx="12" cy="12" r="12" fill="#FC3F1D" />
-                    <path
-                      fill="#fff"
-                      d="M13.3 6.4h-1.5c-1.9 0-3.3 1.2-3.3 3 0 1.4.7 2.2 2 3.1L8 17.6h1.8l2-3.6h.9v3.6h1.6V6.4h-1zm-1 6.2h-.5c-1 0-1.7-.5-1.7-1.8 0-1.3.8-1.8 1.7-1.8h.5v3.6z"
-                    />
-                  </svg>
-                  Продолжить с Yandex ID
-                </button>
+                  <button
+                    type="button"
+                    onClick={registerWithYandex}
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      gap: 11,
+                      width: "100%",
+                      boxSizing: "border-box",
+                      marginTop: 10,
+                      padding: 13,
+                      border: "1px solid #D6DEE9",
+                      borderRadius: 13,
+                      background: "#fff",
+                      color: "#1A1C1E",
+                      font: "600 14.5px 'Golos Text'",
+                      cursor: "pointer",
+                    }}>
+                    <svg width="18" height="18" viewBox="0 0 24 24">
+                      <circle cx="12" cy="12" r="12" fill="#FC3F1D" />
+                      <path
+                        fill="#fff"
+                        d="M13.3 6.4h-1.5c-1.9 0-3.3 1.2-3.3 3 0 1.4.7 2.2 2 3.1L8 17.6h1.8l2-3.6h.9v3.6h1.6V6.4h-1zm-1 6.2h-.5c-1 0-1.7-.5-1.7-1.8 0-1.3.8-1.8 1.7-1.8h.5v3.6z"
+                      />
+                    </svg>
+                    Продолжить с Yandex ID
+                  </button>
                 )}
                 <div style={{ display: "flex", alignItems: "center", gap: 14, margin: "20px 0" }}>
                   <span style={{ flex: 1, height: 1, background: "rgba(20,30,45,.1)" }} />
