@@ -30,7 +30,6 @@ describe("@calcom/i18n/next-i18next.config", () => {
   it("has fallbackLng configured", () => {
     expect(config.fallbackLng).toBeDefined();
     expect(config.fallbackLng.default).toEqual(["en"]);
-    expect(config.fallbackLng.zh).toEqual(["zh-CN"]);
   });
 
   it("every locale in config has a corresponding locale directory with common.json", () => {

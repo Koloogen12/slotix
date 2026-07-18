@@ -1,18 +1,10 @@
-import { TooltipProvider } from "@radix-ui/react-tooltip";
-import type { ReactNode } from "react";
-import { useState } from "react";
-import { useCallback } from "react";
-
+import enTranslations from "@calcom/i18n/locales/en/common.json";
+import ruTranslations from "@calcom/i18n/locales/ru/common.json";
 import type { API_VERSIONS_ENUM } from "@calcom/platform-constants";
 import { IconSprites } from "@calcom/ui/components/icon";
-import deTranslations from "@calcom/i18n/locales/de/common.json";
-import enTranslations from "@calcom/i18n/locales/en/common.json";
-import esTranslations from "@calcom/i18n/locales/es/common.json";
-import frTranslations from "@calcom/i18n/locales/fr/common.json";
-import itTranslations from "@calcom/i18n/locales/it/common.json";
-import nlTranslations from "@calcom/i18n/locales/nl/common.json";
-import ptBrTranslations from "@calcom/i18n/locales/pt-BR/common.json";
-
+import { TooltipProvider } from "@radix-ui/react-tooltip";
+import type { ReactNode } from "react";
+import { useCallback, useState } from "react";
 import { AtomsContext } from "../hooks/useAtomsContext";
 import { useMe } from "../hooks/useMe";
 import { useOAuthClient } from "../hooks/useOAuthClient";
@@ -22,16 +14,11 @@ import { useUpdateUserTimezone } from "../hooks/useUpdateUserTimezone";
 import http from "../lib/http";
 import { Toaster } from "../src/components/ui/toaster";
 import type {
-  translationKeys,
   CalProviderLanguagesType,
   enTranslationKeys,
-  frTranslationKeys,
-  ptBrTranslationKeys,
-  deTranslationKeys,
-  esTranslationKeys,
-  itTranslationKeys,
-  nlTranslationKeys,
   i18nProps,
+  ruTranslationKeys,
+  translationKeys,
 } from "./languages";
 import { EN } from "./languages";
 
@@ -65,7 +52,7 @@ export function BaseCalProvider({
   onTokenRefreshSuccess,
   onTokenRefreshError,
   isEmbed,
-  isOAuth2
+  isOAuth2,
 }: BaseCalProviderProps) {
   const [error, setError] = useState<string>("");
   const [stateOrgId, setOrganizationId] = useState<number>(0);
@@ -170,7 +157,6 @@ export function BaseCalProvider({
     },
   };
 
-
   return isInit ? (
     <AtomsContext.Provider
       value={{
@@ -229,20 +215,8 @@ function replaceOccurrences(input: string, replacementMap: { [key: string]: stri
 
 function getTranslation(key: string, language: CalProviderLanguagesType) {
   switch (language) {
-    case "en":
-      return enTranslations[key as enTranslationKeys];
-    case "fr":
-      return frTranslations[key as frTranslationKeys];
-    case "pt-BR":
-      return ptBrTranslations[key as ptBrTranslationKeys];
-    case "de":
-      return deTranslations[key as deTranslationKeys];
-    case "es":
-      return esTranslations[key as esTranslationKeys];
-    case "it":
-      return itTranslations[key as itTranslationKeys];
-    case "nl":
-      return nlTranslations[key as nlTranslationKeys];
+    case "ru":
+      return ruTranslations[key as ruTranslationKeys];
     default:
       return enTranslations[key as enTranslationKeys];
   }
