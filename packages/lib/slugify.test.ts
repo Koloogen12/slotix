@@ -1,5 +1,4 @@
 import { describe, expect, it } from "vitest";
-
 import { slugify } from "./slugify";
 
 describe("slugify", () => {
@@ -58,5 +57,11 @@ describe("slugify", () => {
   it.skip("should remove unicode", () => {
     expect(slugify("Hello ®️ There")).toEqual("hello-there");
     expect(slugify("®️")).toEqual("");
+  });
+
+  it("should transliterate Cyrillic to Latin", () => {
+    expect(slugify("Бесплатная консультация")).toEqual("besplatnaya-konsultatsiya");
+    expect(slugify("Быстрая видео-встреча")).toEqual("bystraya-video-vstrecha");
+    expect(slugify("Ёлка щ ъ ь")).toEqual("elka-sch");
   });
 });
