@@ -6,7 +6,7 @@ describe("identityProviders", () => {
   describe("NEXTAUTH_TO_IDENTITY_PROVIDER", () => {
     it("contains exactly the expected mapping keys", () => {
       expect(Object.keys(NEXTAUTH_TO_IDENTITY_PROVIDER).sort()).toEqual(
-        ["azure-ad", "cal", "google", "saml", "saml-idp"].sort()
+        ["azure-ad", "cal", "google", "saml", "saml-idp", "yandex"].sort()
       );
     });
   });
@@ -30,6 +30,10 @@ describe("identityProviders", () => {
 
     it("maps 'cal' to CAL", () => {
       expect(getIdentityProvider("cal")).toBe(IdentityProvider.CAL);
+    });
+
+    it("maps 'yandex' to YANDEX", () => {
+      expect(getIdentityProvider("yandex")).toBe(IdentityProvider.YANDEX);
     });
 
     it("returns null for unknown provider", () => {

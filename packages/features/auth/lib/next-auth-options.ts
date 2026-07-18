@@ -328,7 +328,15 @@ if (IS_GOOGLE_LOGIN_ENABLED) {
       allowDangerousEmailAccountLinking: true,
       authorization: {
         params: {
-          scope: [...GOOGLE_OAUTH_SCOPES, ...GOOGLE_CALENDAR_SCOPES].join(" "),
+          // Slotix: request only basic profile/email at login, not Calendar.
+          // Requesting a Sensitive scope (Calendar) here forces every login —
+          // not just users connecting a calendar — through Google's
+          // Testing/verification gate. Calendar is connected separately via
+          // the google-calendar app-store OAuth flow, which still requests
+          // GOOGLE_CALENDAR_SCOPES on its own. (This also means the
+          // auto-install-Google-Calendar-on-login block below is dormant —
+          // `grantedScopes` will never contain the calendar scopes anymore.)
+          scope: GOOGLE_OAUTH_SCOPES.join(" "),
           access_type: "offline",
           prompt: "consent",
         },
