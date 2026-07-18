@@ -190,7 +190,7 @@ export function UserDropdown({ small }: UserDropdownProps) {
           <MenuItem
             variant="destructive"
             onClick={() => {
-              signOut({ callbackUrl: "/auth/logout" });
+              signOut({ callbackUrl: "/" });
             }}>
             <LogOutIcon />
             {t("sign_out")}

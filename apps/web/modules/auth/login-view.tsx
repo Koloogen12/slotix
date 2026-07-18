@@ -36,13 +36,9 @@ interface LoginValues {
   csrfToken: string;
 }
 
-const MicrosoftIcon = () => (
-  <img className="size-4" src="/microsoft-logo.svg" alt="" />
-);
+const MicrosoftIcon = () => <img className="size-4" src="/microsoft-logo.svg" alt="" />;
 
-const GoogleIcon = () => (
-  <img className="size-4" src="/google-icon-colored.svg" alt="" />
-);
+const GoogleIcon = () => <img className="size-4" src="/google-icon-colored.svg" alt="" />;
 
 function BackgroundGrid() {
   const rows = 9;
@@ -257,7 +253,7 @@ export default function Login({
                       {...register("email")}
                     />
                     {formState.errors.email && (
-                      <p data-testid="field-error" className="text-destructive-foreground text-xs">
+                      <p data-testid="field-error" className="text-destructive text-xs">
                         {formState.errors.email.message}
                       </p>
                     )}
@@ -290,7 +286,7 @@ export default function Login({
                       </InputGroupAddon>
                     </InputGroup>
                     {formState.errors.password && (
-                      <p data-testid="field-error" className="text-destructive-foreground text-xs">
+                      <p data-testid="field-error" className="text-destructive text-xs">
                         {formState.errors.password.message}
                       </p>
                     )}

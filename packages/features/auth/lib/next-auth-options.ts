@@ -866,6 +866,21 @@ export const getOptions = ({
           });
           return "/auth/error?error=unknown-provider";
         }
+
+        // Yandex accounts without a display name set fall back to returning the
+        // login/email itself as `display_name` (see node_modules/next-auth/providers/yandex.js
+        // profile() — display_name ?? real_name ?? first_name). Using that raw string as the
+        // user's name pollutes the onboarding "Имя" field and the auto-generated slug with an
+        // email address, so turn it into a readable name instead.
+        if (idP === IdentityProvider.YANDEX && user.name?.includes("@")) {
+          const localPart = user.name.split("@")[0];
+          user.name = localPart
+            .replace(/[._-]+/g, " ")
+            .split(" ")
+            .filter(Boolean)
+            .map((part) => part[0].toUpperCase() + part.slice(1))
+            .join(" ");
+        }
         // Use optional chaining for safety, especially with AdapterUser potentially having different structure initially.
         const isEmailVerified = user.emailVerified || (profile as ExtendedOAuthProfile)?.email_verified;
 
