@@ -5,14 +5,12 @@ import { useBookerStoreContext } from "@calcom/features/bookings/Booker/BookerSt
 import type { BookerLayout } from "@calcom/features/bookings/Booker/types";
 import { TimeFormatToggle } from "@calcom/features/bookings/components/TimeFormatToggle";
 import { useInitializeWeekStart } from "@calcom/features/bookings/hooks/useInitializeWeekStart";
-import { WEBAPP_URL } from "@calcom/lib/constants";
 import { formatDateTime } from "@calcom/lib/dateTimeFormatter";
 import { useLocale } from "@calcom/lib/hooks/useLocale";
 import { BookerLayouts } from "@calcom/prisma/zod-utils";
 import { Button } from "@calcom/ui/components/button";
 import { ButtonGroup } from "@calcom/ui/components/buttonGroup";
 import { ToggleGroup } from "@calcom/ui/components/form";
-import { Tooltip } from "@calcom/ui/components/tooltip";
 import { CalendarIcon, Columns3Icon, Grid3x3Icon } from "@coss/ui/icons";
 import { useCallback, useMemo } from "react";
 import { shallow } from "zustand/shallow";
@@ -37,7 +35,6 @@ export function Header({
   isCalendarView?: boolean;
 }) {
   const { t, i18n } = useLocale();
-  const isEmbed = useIsEmbed();
   const isPlatform = useIsPlatform();
   const [layout, setLayout] = useBookerStoreContext((state) => [state.layout, state.setLayout], shallow);
   const selectedDateString = useBookerStoreContext((state) => state.selectedDate);
@@ -64,23 +61,10 @@ export function Header({
   if (isMobile || !enabledLayouts) return null;
 
   // Slotix: the public booking page is a clean single-purpose screen (matches the prototype),
-  // so we hide the "overlay my calendar" toggle and the month/week/column layout switcher.
-  // The owner still gets their "need help" troubleshoot shortcut on their own link.
+  // so we hide the "overlay my calendar" toggle, the month/week/column layout switcher, and
+  // (per owner request) the "need help" troubleshoot shortcut previously shown to the owner
+  // on their own link.
   if (isMonthView) {
-    if (isMyLink && !isEmbed) {
-      return (
-        <div className="flex gap-2">
-          <Tooltip content={t("troubleshooter_tooltip")} side="bottom">
-            <Button
-              color="primary"
-              target="_blank"
-              href={`${WEBAPP_URL}/availability/troubleshoot?eventType=${eventSlug}`}>
-              {t("need_help")}
-            </Button>
-          </Tooltip>
-        </div>
-      );
-    }
     return null;
   }
   const endDate = selectedDate.add(layout === BookerLayouts.COLUMN_VIEW ? extraDays : extraDays - 1, "days");
@@ -96,7 +80,7 @@ export function Header({
     formatDateTime(date, { locale: i18n.language ?? "en", month: "short" });
   const FormattedSelectedDateRange = () => {
     return (
-      <h3 className="min-w-[150px] text-base font-semibold leading-4">
+      <h3 className="min-w-[150px] font-semibold text-base leading-4">
         {formatMonthLabel(selectedDate.toDate())} {selectedDate.format("D")}
         {!isSameYear() && <span className="text-subtle">, {selectedDate.format("YYYY")} </span>}-{" "}
         {!isSameMonth() && formatMonthLabel(endDate.toDate())} {endDate.format("D")},{" "}
@@ -108,7 +92,7 @@ export function Header({
   };
 
   return (
-    <div className="border-default relative z-10 flex border-b px-5 py-4 ltr:border-l rtl:border-r">
+    <div className="relative z-10 flex border-default border-b px-5 py-4 ltr:border-l rtl:border-r">
       <div className="flex items-center gap-5 rtl:grow">
         <FormattedSelectedDateRange />
         <ButtonGroup>
